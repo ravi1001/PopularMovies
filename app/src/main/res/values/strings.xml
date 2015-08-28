@@ -4,5 +4,11 @@
 
     <!-- Message in empty grid view depicting data load operation -->
     <string name="msg_status_loading">Loading data, please wait...</string>
+    <string name="title_activity_details">DetailsActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
