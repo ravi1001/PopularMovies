@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Displays a grid of movie poster thumbnails -->
+    <GridView
+        android:id="@+id/discover_gridview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnWidth="120dp"
+        android:numColumns="auto_fit"
+        android:stretchMode="columnWidth"
+        android:gravity="center">
+    </GridView>
+
+    <!-- Displays status message in empty grid -->
+    <TextView
+        android:id="@+id/status_gridview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="@string/msg_status_loading"
+        style="@android:style/TextAppearance.Large"
+        android:gravity="center">
+    </TextView>
+
+</LinearLayout>
+

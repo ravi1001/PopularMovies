@@ -1,0 +1,8 @@
+<!-- One pane layout primarily targeting phones -->
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_discover"
+    android:name="com.ravi.apps.android.popularmovies.DiscoverFragment"
+    tools:layout="@layout/fragment_discover"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />

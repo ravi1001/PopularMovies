@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pop Movies</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Message in empty grid view depicting data load operation -->
+    <string name="msg_status_loading">Loading data, please wait...</string>
+
+</resources>
