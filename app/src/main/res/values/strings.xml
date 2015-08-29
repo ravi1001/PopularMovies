@@ -1,9 +1,11 @@
 <resources>
     <string name="app_name">Pop Movies</string>
-    <string name="action_settings">Settings</string>
     <string name="title_activity_details">Movie Details</string>
+    <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
 
+    <!-- TMDB API key -->
+    <string name="tmdb_api_key">specify a valid tmdb api key</string>
 
     <!-- Key for sort order preference -->
     <string name="pref_sort_order_key" translatable="false">sort_order</string>
@@ -14,22 +16,29 @@
     <!-- Highest rated sort order preference -->
     <string name="pref_sort_order_highest_rated">1</string>
 
-
-
-    <!-- Message in empty grid view depicting data load operation -->
+    <!-- Status message in empty grid view depicting data load operation -->
     <string name="msg_status_loading">Loading data, please wait...</string>
 
+    <!-- Error message when title data is unavailable -->
+    <string name="msg_err_title_unavailable">Title is unavailable</string>
+    <!-- Error message when release date data is unavailable -->
+    <string name="msg_err_release_date_unavailable">Release date is unavailable</string>
+    <!-- Error message when overview data is unavailable -->
+    <string name="msg_err_overview_unavailable">Overview is unavailable</string>
+    <!-- Error message when connection to host failed -->
+    <string name="msg_err_unknown_host">Unable to connect to remote server.
+            Please check your internet connection and try again.</string>
+    <!-- Error message when authentication with host failed -->
+    <string name="msg_err_authentication_failed">Authentication with remote server failed.</string>
+    <!-- Default error message -->
+    <string name="msg_err_default">An error occurred while loading data from remote server.</string>
 
-
-
-
-
-
-
-    <string name="hello_world">Hello world!</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Exception when application is unable to connect to the host -->
+    <string name="err_unknown_host">Unable to resolve host</string>
+    <!-- Exception when authentication failed with the host -->
+    <string name="err_authentication_failed">No authentication challenges found</string>
+    <!-- Exception when query returned zero results -->
+    <string name="err_zero_results">Query returned zero results</string>
 
 
 </resources>
