@@ -60,6 +60,13 @@ public class MainActivity extends AppCompatActivity implements DiscoverFragment.
 
     @Override
     public void onMovieSelected(DiscoverData discoverData) {
+        // Create intent to launch details activity.
+        Intent intent = new Intent(this, DetailsActivity.class);
 
+        // Add movie details into extra.
+        intent.putExtra(DetailsFragment.DISCOVER_MOVIE, discoverData);
+
+        // Start details activity.
+        startActivity(intent);
     }
 }

@@ -23,6 +23,8 @@
     <string name="msg_err_title_unavailable">Title is unavailable</string>
     <!-- Error message when release date data is unavailable -->
     <string name="msg_err_release_date_unavailable">Release date is unavailable</string>
+    <!-- Error message when rating data is unavailable -->
+    <string name="msg_err_rating_unavailable">Rating is unavailable</string>
     <!-- Error message when overview data is unavailable -->
     <string name="msg_err_overview_unavailable">Overview is unavailable</string>
     <!-- Error message when connection to host failed -->
