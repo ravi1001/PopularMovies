@@ -72,7 +72,6 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
 
     public DiscoverLoader(Context context) {
         super(context);
-        Log.v(LOG_TAG, "DiscoverLoader");
     }
 
     /**
@@ -82,7 +81,6 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
      */
     @Override
     public DiscoverLoaderResult loadInBackground() {
-        Log.v(LOG_TAG, "loadInBackground");
 
         DiscoverLoaderResult loaderResult = new DiscoverLoaderResult();
         List<DiscoverData> movieList = null;
@@ -212,8 +210,6 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
 
     @Override
     public void deliverResult(DiscoverLoaderResult data) {
-        Log.v(LOG_TAG, "deliverResult");
-
         // Return if the loader was reset.
         if(isReset()) {
             return;
@@ -231,20 +227,16 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
 
     @Override
     protected void onStartLoading() {
-        Log.v(LOG_TAG, "onStartLoading");
-
         // Force load only if results are not available.
         if(mLoaderResult != null) {
             deliverResult(mLoaderResult);
         } else {
-            Log.v(LOG_TAG, "forceLoad()");
             forceLoad();
         }
     }
 
     @Override
     protected void onStopLoading() {
-        Log.v(LOG_TAG, "onStopLoading");
         cancelLoad();
     }
 
@@ -255,7 +247,6 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
 
     @Override
     protected void onReset() {
-        Log.v(LOG_TAG, "onReset");
         super.onReset();
 
         onStopLoading();
