@@ -39,17 +39,23 @@ public class DiscoverFragment extends Fragment implements
     // Loader that asynchronously fetches the discover movies data.
     private static final int LOADER_ID = 1;
 
+    // Grid view first visible index key.
+    private static String GRID_INDEX_KEY = "Grid index key";
+
     // Grid view that displays the movie poster thumbnails.
     private GridView mGridView;
 
     // Adapter holding the list of movie data.
     private DiscoverAdapter mMovieListingAdapter;
 
+    // Text view for displaying appropriate user message when the grid is blank.
+    private TextView mEmptyGridMessage;
+
     // Current sort order preference.
     private String mSortOrderPreference;
 
-    // Text view for displaying appropriate user message when the grid is blank.
-    private TextView mEmptyGridMessage;
+    // First visible index in the grid view.
+    private int mGridIndex;
 
     public DiscoverFragment() {
     }
@@ -78,8 +84,17 @@ public class DiscoverFragment extends Fragment implements
         // Set the text view for empty grid view.
         mGridView.setEmptyView(mEmptyGridMessage);
 
+        // Show the selector on top of the selected item.
+        mGridView.setDrawSelectorOnTop(true);
+
         // Get the current sort order from shared preferences.
         mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
+
+        // Check whether the configuration changed.
+        if(savedInstanceState != null) {
+            // Restore the grid index only if the sort order preference has not changed.
+            restoreGridIndex(savedInstanceState);
+        }
 
         return rootView;
     }
@@ -101,6 +116,9 @@ public class DiscoverFragment extends Fragment implements
             // Update the sort order from the shared preferences.
             mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
 
+            // Reset the grid index.
+            mGridIndex = 0;
+
             // Explicitly calling onLoaderReset() here as the LoaderManager does not invoke it
             // even after restartLoader() call.
             onLoaderReset(null);
@@ -109,6 +127,20 @@ public class DiscoverFragment extends Fragment implements
             // to be fetched from the remote server.
             getLoaderManager().restartLoader(LOADER_ID, null, this);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // Save the current sort order preference.
+        outState.putString(getString(R.string.pref_sort_order_key), mSortOrderPreference);
+
+        // Save the grid index.
+        mGridIndex = mGridView.getFirstVisiblePosition();
+        if(mGridIndex != GridView.INVALID_POSITION) {
+            outState.putInt(GRID_INDEX_KEY, mGridIndex);
+        }
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -127,6 +159,11 @@ public class DiscoverFragment extends Fragment implements
         if(exception == null) {
             // Data load successful. Add the loaded data into adapter.
             mMovieListingAdapter.addAll(data.getData());
+
+            // Move to appropriate index.
+            if(mGridIndex != GridView.INVALID_POSITION) {
+                mGridView.setSelection(mGridIndex);
+            }
         } else {
             // Data load failed. Display appropriate error message to user.
             mEmptyGridMessage.setText(Utility.getErrorMessage(getActivity(), exception));
@@ -154,5 +191,21 @@ public class DiscoverFragment extends Fragment implements
      */
     public interface Callback {
         void onMovieSelected(DiscoverData discoverData);
+    }
+
+    /*
+     * Retrieves and restores the grid index after configuration change only if
+     * the sort order preference was not changed.
+     */
+    private void restoreGridIndex(Bundle savedInstanceState) {
+        // Check if the sort order preference is unchanged.
+        if(savedInstanceState.containsKey(getString(R.string.pref_sort_order_key))) {
+            if(mSortOrderPreference == savedInstanceState.get(getString(R.string.pref_sort_order_key))) {
+                // Retrieve and restore the saved grid index.
+                if(savedInstanceState.containsKey(GRID_INDEX_KEY)) {
+                    mGridIndex = savedInstanceState.getInt(GRID_INDEX_KEY);
+                }
+            }
+        }
     }
 }
