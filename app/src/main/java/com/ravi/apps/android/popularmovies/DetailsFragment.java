@@ -75,31 +75,47 @@ public class DetailsFragment extends Fragment {
      * Validates and sets the appropriate movie data onto all the views.
      */
     private void setViews() {
-        // Set data for original title view.
-        if(mDiscoverData.getOriginalTitle() != null && !mDiscoverData.getOriginalTitle().isEmpty()) {
+        // Check for errors or invalid data.
+        if(mDiscoverData.getOriginalTitle() != null
+                && !mDiscoverData.getOriginalTitle().isEmpty()
+                && !mDiscoverData.getOriginalTitle().equals("null")) {
+            // Set data for original title view.
             bindDataToView(mOriginalTitleView);
         } else {
+            // Set error message.
             bindErrorTextToView(mOriginalTitleView);
         }
 
-        // Set data for poster image view.
-        if(mDiscoverData.getPosterPath() != null && !mDiscoverData.getPosterPath().isEmpty())
+        // Check for errors or invalid data.
+        if(mDiscoverData.getPosterPath() != null
+                && !mDiscoverData.getPosterPath().isEmpty()
+                && !mDiscoverData.getPosterPath().equals("null")) {
+            // Set data for poster image view.
             bindDataToView(mPosterView);
+        }
 
-        // Set data for release date view.
-        if(mDiscoverData.getReleaseDate() != null && !mDiscoverData.getReleaseDate().isEmpty()) {
+        // Check for errors or invalid data.
+        if(mDiscoverData.getReleaseDate() != null
+                && !mDiscoverData.getReleaseDate().isEmpty()
+                && !mDiscoverData.getReleaseDate().equals("null")) {
+            // Set data for release date view.
             bindDataToView(mReleaseDateView);
         } else {
+            // Set error message.
             bindErrorTextToView(mReleaseDateView);
         }
 
         // Set data for average rating view.
         bindDataToView(mVoteAverageView);
 
-        // Set data for plot synopsis view.
-        if(mDiscoverData.getOverview() != null && !mDiscoverData.getOverview().isEmpty()) {
+        // Check for errors or invalid data.
+        if(mDiscoverData.getOverview() != null
+                && !mDiscoverData.getOverview().isEmpty()
+                && !mDiscoverData.getOverview().equals("null")) {
+            // Set data for plot synopsis view.
             bindDataToView(mOverviewView);
         } else {
+            // Set error message.
             bindErrorTextToView(mOverviewView);
         }
     }
