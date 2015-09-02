@@ -30,19 +30,19 @@ import java.util.List;
 /**
  * Array adapter storing the list of movie data.
  */
-public class DiscoverAdapter extends ArrayAdapter<DiscoverData> {
+public class DiscoverAdapter extends ArrayAdapter<Movie> {
 
     // List of movie data.
-    private List<DiscoverData> mDiscoverDataList;
+    private List<Movie> mMovieList;
 
-    public DiscoverAdapter(Context context, List<DiscoverData> discoverDataList) {
-        super(context, 0, discoverDataList);
-        mDiscoverDataList = discoverDataList;
+    public DiscoverAdapter(Context context, List<Movie> movieList) {
+        super(context, 0, movieList);
+        mMovieList = movieList;
     }
 
     @Override
     public int getCount() {
-        return mDiscoverDataList.size();
+        return mMovieList.size();
     }
 
     @Override
@@ -51,8 +51,8 @@ public class DiscoverAdapter extends ArrayAdapter<DiscoverData> {
     }
 
     @Override
-    public DiscoverData getItem(int position) {
-        return mDiscoverDataList.get(position);
+    public Movie getItem(int position) {
+        return mMovieList.get(position);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class DiscoverAdapter extends ArrayAdapter<DiscoverData> {
         }
 
         // Extract the movie poster path url.
-        String posterUrl = mDiscoverDataList.get(position)
+        String posterUrl = mMovieList.get(position)
                 .getPosterPath();
 
         // Load the movie poster into image view using Picasso.

@@ -36,12 +36,15 @@ public class DetailsFragment extends Fragment {
     public static final String DISCOVER_MOVIE = "Discover Movie";
 
     // References to the views being displayed.
-    private DiscoverData mDiscoverData;
+    private Movie mMovie;
     private TextView mOriginalTitleView;
     private ImageView mPosterView;
     private TextView mReleaseDateView;
     private TextView mVoteAverageView;
     private TextView mOverviewView;
+
+    // Current sort order preference.
+    private String mSortOrderPreference;
 
     public DetailsFragment() {
     }
@@ -55,7 +58,7 @@ public class DetailsFragment extends Fragment {
         // Get the arguments set for this fragment.
         Bundle arguments = getArguments();
         if(arguments != null) {
-            mDiscoverData = arguments.getParcelable(DISCOVER_MOVIE);
+            mMovie = arguments.getParcelable(DISCOVER_MOVIE);
         }
 
         // Get references for the views.
@@ -68,7 +71,52 @@ public class DetailsFragment extends Fragment {
         // Validate and set the data onto all the views.
         setViews();
 
+        // Get the current sort order from shared preferences.
+        mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
+
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // Save the current sort order preference.
+        outState.putString(getString(R.string.pref_sort_order_key), mSortOrderPreference);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // Restore the saved sort order preference.
+        if(savedInstanceState != null
+                && savedInstanceState.containsKey(getString(R.string.pref_sort_order_key))) {
+           mSortOrderPreference =
+                   savedInstanceState.getString(getString(R.string.pref_sort_order_key));
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Check if the sort order preference has changed.
+        if(mSortOrderPreference != Utility.getSortOrderPreference(getActivity())) {
+            // Update the sort order preference flag.
+            mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
+
+            // Notify the hosting activity of the sort order change event.
+            ((OnSortPreferenceChangedListener) getActivity()).onSortPreferenceChanged(this);
+        }
+    }
+
+    /**
+     * Public interface that needs to be implemented by the hosting activity to receive
+     * notifications from the fragment whenever the user changes the sort order preference.
+     */
+    public interface OnSortPreferenceChangedListener {
+        void onSortPreferenceChanged(DetailsFragment detailsFragment);
     }
 
     /*
@@ -76,9 +124,9 @@ public class DetailsFragment extends Fragment {
      */
     private void setViews() {
         // Check for errors or invalid data.
-        if(mDiscoverData.getOriginalTitle() != null
-                && !mDiscoverData.getOriginalTitle().isEmpty()
-                && !mDiscoverData.getOriginalTitle().equals("null")) {
+        if(mMovie.getOriginalTitle() != null
+                && !mMovie.getOriginalTitle().isEmpty()
+                && !mMovie.getOriginalTitle().equals("null")) {
             // Set data for original title view.
             bindDataToView(mOriginalTitleView);
         } else {
@@ -87,17 +135,17 @@ public class DetailsFragment extends Fragment {
         }
 
         // Check for errors or invalid data.
-        if(mDiscoverData.getPosterPath() != null
-                && !mDiscoverData.getPosterPath().isEmpty()
-                && !mDiscoverData.getPosterPath().equals("null")) {
+        if(mMovie.getPosterPath() != null
+                && !mMovie.getPosterPath().isEmpty()
+                && !mMovie.getPosterPath().equals("null")) {
             // Set data for poster image view.
             bindDataToView(mPosterView);
         }
 
         // Check for errors or invalid data.
-        if(mDiscoverData.getReleaseDate() != null
-                && !mDiscoverData.getReleaseDate().isEmpty()
-                && !mDiscoverData.getReleaseDate().equals("null")) {
+        if(mMovie.getReleaseDate() != null
+                && !mMovie.getReleaseDate().isEmpty()
+                && !mMovie.getReleaseDate().equals("null")) {
             // Set data for release date view.
             bindDataToView(mReleaseDateView);
         } else {
@@ -109,9 +157,9 @@ public class DetailsFragment extends Fragment {
         bindDataToView(mVoteAverageView);
 
         // Check for errors or invalid data.
-        if(mDiscoverData.getOverview() != null
-                && !mDiscoverData.getOverview().isEmpty()
-                && !mDiscoverData.getOverview().equals("null")) {
+        if(mMovie.getOverview() != null
+                && !mMovie.getOverview().isEmpty()
+                && !mMovie.getOverview().equals("null")) {
             // Set data for plot synopsis view.
             bindDataToView(mOverviewView);
         } else {
@@ -127,21 +175,21 @@ public class DetailsFragment extends Fragment {
         // Check which view was passed in.
         if(view == mOriginalTitleView) {
             // Bind the original title.
-            mOriginalTitleView.setText(mDiscoverData.getOriginalTitle());
+            mOriginalTitleView.setText(mMovie.getOriginalTitle());
         } else if(view == mPosterView) {
             // Load the poster image using Picasso.
             Picasso.with(getActivity())
-                    .load(mDiscoverData.getPosterPath())
+                    .load(mMovie.getPosterPath())
                     .into(mPosterView);
         } else if(view == mReleaseDateView) {
             // Bind the release date.
-            mReleaseDateView.setText(mDiscoverData.getReleaseDate().substring(0, 4));
+            mReleaseDateView.setText(mMovie.getReleaseDate().substring(0, 4));
         } else if(view == mVoteAverageView) {
             // Bind the average rating.
-            mVoteAverageView.setText(((Double) mDiscoverData.getVoteAverage()).toString() + "/10");
+            mVoteAverageView.setText(((Double) mMovie.getVoteAverage()).toString() + "/10");
         } else if(view == mOverviewView) {
             // bind the plot synopsis.
-            mOverviewView.setText(mDiscoverData.getOverview());
+            mOverviewView.setText(mMovie.getOverview());
         }
     }
 

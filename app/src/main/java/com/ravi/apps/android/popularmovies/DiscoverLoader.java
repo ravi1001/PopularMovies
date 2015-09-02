@@ -83,7 +83,7 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
     public DiscoverLoaderResult loadInBackground() {
 
         DiscoverLoaderResult loaderResult = new DiscoverLoaderResult();
-        List<DiscoverData> movieList = null;
+        List<Movie> movieList = null;
 
         HttpURLConnection httpURLConnection = null;
         BufferedReader bufferedReader = null;
@@ -164,7 +164,7 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
      * Parses the input JSON string and returns a list of movie data. Throws a
      * JSON exception in case of any error.
      */
-    private List<DiscoverData> getMovieListFromJson(String jsonResponseString)
+    private List<Movie> getMovieListFromJson(String jsonResponseString)
             throws JSONException {
 
         // Create the JSON object from the input string.
@@ -179,7 +179,7 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
         // Parse the results array only if it's not empty.
         if(resultsLength != 0) {
             // Create the list to store the movie data objects.
-            List<DiscoverData> discoverDataList = new ArrayList<>();
+            List<Movie> movieList = new ArrayList<>();
 
             // Traverse each result.
             for(int i = 0; i < resultsLength; i++) {
@@ -195,13 +195,13 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
                 double vote = jsonMovie.getDouble(TMDB_VOTE_AVERAGE);
 
                 // Create the movie data object.
-                DiscoverData discoverData = new DiscoverData(id, title, poster, date, vote, overview);
+                Movie movie = new Movie(id, title, poster, date, vote, overview);
 
                 // Add the movie data object to the list.
-                discoverDataList.add(discoverData);
+                movieList.add(movie);
             }
 
-            return discoverDataList;
+            return movieList;
         } else {
             // No results found in the JSON response string.
             throw new JSONException(getContext().getString(R.string.err_zero_results));

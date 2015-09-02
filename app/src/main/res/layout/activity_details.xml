@@ -1,3 +1,4 @@
+<!-- Contains the movie details fragment -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/movie_details_container"

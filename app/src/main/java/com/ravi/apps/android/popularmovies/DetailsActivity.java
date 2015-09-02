@@ -25,7 +25,8 @@ import android.view.MenuItem;
 /**
  * Contains and creates the movie details fragment.
  */
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity
+        implements DetailsFragment.OnSortPreferenceChangedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,12 @@ public class DetailsActivity extends AppCompatActivity {
                     .add(R.id.movie_details_container, detailsFragment)
                     .commit();
         }
+    }
+
+    @Override
+    public void onSortPreferenceChanged(DetailsFragment detailsFragment) {
+        // Do nothing and ignore the event as it is in single pane mode.
+        return;
     }
 
     @Override

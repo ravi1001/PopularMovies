@@ -39,7 +39,7 @@ public class DiscoverFragment extends Fragment implements
     // Loader that asynchronously fetches the discover movies data.
     private static final int LOADER_ID = 1;
 
-    // Grid view first visible index key.
+    // Grid view item index key.
     private static String GRID_INDEX_KEY = "Grid index key";
 
     // Grid view that displays the movie poster thumbnails.
@@ -54,8 +54,11 @@ public class DiscoverFragment extends Fragment implements
     // Current sort order preference.
     private String mSortOrderPreference;
 
-    // First visible index in the grid view.
+    // Index of selected item or first visible item in the grid view.
     private int mGridIndex;
+
+    // Whether a movie has been selected.
+    private boolean mIsMovieSelected;
 
     public DiscoverFragment() {
     }
@@ -66,7 +69,7 @@ public class DiscoverFragment extends Fragment implements
         View rootView = inflater.inflate(R.layout.fragment_discover, container, false);
 
         // Create the movie data adapter.
-        mMovieListingAdapter = new DiscoverAdapter(getActivity(), new ArrayList<DiscoverData>());
+        mMovieListingAdapter = new DiscoverAdapter(getActivity(), new ArrayList<Movie>());
 
         // Get the grid view.
         mGridView = (GridView) rootView.findViewById(R.id.discover_gridview);
@@ -83,9 +86,6 @@ public class DiscoverFragment extends Fragment implements
 
         // Set the text view for empty grid view.
         mGridView.setEmptyView(mEmptyGridMessage);
-
-        // Show the selector on top of the selected item.
-        mGridView.setDrawSelectorOnTop(true);
 
         // Get the current sort order from shared preferences.
         mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
@@ -134,8 +134,12 @@ public class DiscoverFragment extends Fragment implements
         // Save the current sort order preference.
         outState.putString(getString(R.string.pref_sort_order_key), mSortOrderPreference);
 
+        // Check if any movie was selected, if not save first visible position.
+        if(mIsMovieSelected = false) {
+            mGridIndex = mGridView.getFirstVisiblePosition();
+        }
+
         // Save the grid index.
-        mGridIndex = mGridView.getFirstVisiblePosition();
         if(mGridIndex != GridView.INVALID_POSITION) {
             outState.putInt(GRID_INDEX_KEY, mGridIndex);
         }
@@ -178,19 +182,23 @@ public class DiscoverFragment extends Fragment implements
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        // Set movie selected flag and store the click position into grid index.
+        mIsMovieSelected = true;
+        mGridIndex = position;
+
         // Get the movie data corresponding to the movie clicked by user from adapter.
-        DiscoverData discoverData = (DiscoverData) parent.getItemAtPosition(position);
+        Movie movie = (Movie) parent.getItemAtPosition(position);
 
         // Notify the activity that the user clicked a movie and pass on the movie details.
-        ((Callback) getActivity()).onMovieSelected(discoverData);
+        ((OnMovieSelectedListener) getActivity()).onMovieSelected(movie);
     }
 
     /**
      * Public interface that needs to be implemented by the hosting activity to receive
      * notifications from fragment whenever the user selects/clicks on a movie.
      */
-    public interface Callback {
-        void onMovieSelected(DiscoverData discoverData);
+    public interface OnMovieSelectedListener {
+        void onMovieSelected(Movie movie);
     }
 
     /*

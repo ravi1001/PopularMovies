@@ -23,7 +23,7 @@ import android.os.Parcelable;
  * Stores the detailed information about a specific movie and implements the parcelable
  * interface to enable it to be passed to other activities through intents.
  */
-public class DiscoverData implements Parcelable {
+public class Movie implements Parcelable {
 
     // Detailed movie information.
     private final int mId;
@@ -34,21 +34,21 @@ public class DiscoverData implements Parcelable {
     private final String mOverview;
 
     // Reference used to recreate the object from the parcel.
-    public static final Parcelable.Creator<DiscoverData> CREATOR =
-            new Parcelable.Creator<DiscoverData>() {
+    public static final Parcelable.Creator<Movie> CREATOR =
+            new Parcelable.Creator<Movie>() {
                 @Override
-                public DiscoverData createFromParcel(Parcel source) {
-                    return new DiscoverData(source);
+                public Movie createFromParcel(Parcel source) {
+                    return new Movie(source);
                 }
 
                 @Override
-                public DiscoverData[] newArray(int size) {
-                    return new DiscoverData[size];
+                public Movie[] newArray(int size) {
+                    return new Movie[size];
                 }
             };
 
     // Public constructor.
-    public DiscoverData(int id, String title, String url, String date, double rating, String synopsis) {
+    public Movie(int id, String title, String url, String date, double rating, String synopsis) {
         // Store the movie details data into respective member variables.
         mId = id;
         mOriginalTitle = title;
@@ -59,7 +59,7 @@ public class DiscoverData implements Parcelable {
     }
 
     // Private constructor used to re-create the object from the parcel.
-    private DiscoverData(Parcel source) {
+    private Movie(Parcel source) {
         // Extract the movie details data from the parcel and store it into
         // the respective member variables.
         mId = source.readInt();

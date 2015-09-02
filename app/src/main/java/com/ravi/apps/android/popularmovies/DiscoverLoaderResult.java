@@ -25,13 +25,13 @@ import java.util.List;
 public class DiscoverLoaderResult {
 
     // List of movie data.
-    private List<DiscoverData> mDiscoverDataList;
+    private List<Movie> mMovieList;
     // Stores the error that occurred during the load operation. Null if no errors.
     private Exception mException;
 
     // Returns the list of movie data.
-    public List<DiscoverData> getData() {
-        return mDiscoverDataList;
+    public List<Movie> getData() {
+        return mMovieList;
     }
 
     // Returns the error.
@@ -40,8 +40,8 @@ public class DiscoverLoaderResult {
     }
 
     // Sets the list of movie data.
-    public void setData(List<DiscoverData> data) {
-        mDiscoverDataList = data;
+    public void setData(List<Movie> data) {
+        mMovieList = data;
     }
 
     // Sets the exception.

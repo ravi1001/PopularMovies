@@ -23,7 +23,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity implements DiscoverFragment.Callback {
+public class MainActivity extends AppCompatActivity implements
+        DiscoverFragment.OnMovieSelectedListener, DetailsFragment.OnSortPreferenceChangedListener {
+
+    // Holds whether the main activity layout contains two panes.
+    private boolean mIsTwoPaneMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,13 @@ public class MainActivity extends AppCompatActivity implements DiscoverFragment.
 
         // Set default values only the first time.
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        // Check if the layout has two panes and set the flag accordingly.
+        if(findViewById(R.id.movie_details_container) != null) {
+            mIsTwoPaneMode = true;
+        } else {
+            mIsTwoPaneMode = false;
+        }
     }
 
     @Override
@@ -59,14 +70,41 @@ public class MainActivity extends AppCompatActivity implements DiscoverFragment.
     }
 
     @Override
-    public void onMovieSelected(DiscoverData discoverData) {
-        // Create intent to launch details activity.
-        Intent intent = new Intent(this, DetailsActivity.class);
+    public void onMovieSelected(Movie movie) {
+        // Check if it's in two pane mode.
+        if(mIsTwoPaneMode) {
+            // Package the parcelable movie data into the arguments bundle.
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailsFragment.DISCOVER_MOVIE, movie);
 
-        // Add movie details into extra.
-        intent.putExtra(DetailsFragment.DISCOVER_MOVIE, discoverData);
+            // Create the details fragment object.
+            DetailsFragment detailsFragment = new DetailsFragment();
 
-        // Start details activity.
-        startActivity(intent);
+            // Set arguments containing movie details.
+            detailsFragment.setArguments(arguments);
+
+            // Add the fragment onto the container.
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.movie_details_container, detailsFragment)
+                    .commit();
+        } else {
+            // Create intent to launch details activity.
+            Intent intent = new Intent(this, DetailsActivity.class);
+
+            // Add movie details into extra.
+            intent.putExtra(DetailsFragment.DISCOVER_MOVIE, movie);
+
+            // Start details activity.
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onSortPreferenceChanged(DetailsFragment detailsFragment) {
+        // Remove the fragment.
+        getFragmentManager().beginTransaction()
+               .remove(detailsFragment)
+               .commit();
+
     }
 }
