@@ -195,7 +195,7 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
                 double vote = jsonMovie.getDouble(TMDB_VOTE_AVERAGE);
 
                 // Create the movie data object.
-                Movie movie = new Movie(id, title, poster, date, vote, overview);
+                Movie movie = new Movie(id, title, poster, date, vote, overview, null, null);
 
                 // Add the movie data object to the list.
                 movieList.add(movie);
