@@ -29,7 +29,7 @@ import java.util.List;
 public class Movie implements Parcelable {
 
     // Detailed movie information.
-    private final int mId;
+    private final long mId;
     private final String mOriginalTitle;
     private final String mPosterPath;
     private final String mReleaseDate;
@@ -43,12 +43,12 @@ public class Movie implements Parcelable {
      */
     public static class Trailer implements Parcelable {
         // Trailer information.
-        private final int mId;
+        private final long mId;
         private final String mKey;
         private final String mName;
 
         // Public constructor.
-        public Trailer(int id, String key, String name) {
+        public Trailer(long id, String key, String name) {
             // Store the trailer details data into respective member variables.
             mId = id;
             mKey = key;
@@ -59,7 +59,7 @@ public class Movie implements Parcelable {
         private Trailer(Parcel source) {
             // Extract the trailer details data from the parcel and store it into
             // the respective member variables.
-            mId = source.readInt();
+            mId = source.readLong();
             mKey = source.readString();
             mName = source.readString();
         }
@@ -86,13 +86,13 @@ public class Movie implements Parcelable {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             // Write the trailer details data into the parcel.
-            dest.writeInt(mId);
+            dest.writeLong(mId);
             dest.writeString(mKey);
             dest.writeString(mName);
         }
 
         // Returns the trailer id.
-        public int getId() {
+        public long getId() {
             return mId;
         }
 
@@ -112,13 +112,13 @@ public class Movie implements Parcelable {
      */
     public static class Review implements Parcelable  {
         // Review information.
-        private final int mId;
+        private final long mId;
         private final String mAuthor;
         private final String mContent;
         private final String mUrl;
 
         // Public constructor.
-        public Review(int id, String author, String content, String url) {
+        public Review(long id, String author, String content, String url) {
             // Store the review details data into respective member variables.
             mId = id;
             mAuthor = author;
@@ -158,14 +158,14 @@ public class Movie implements Parcelable {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             // Write the review details data into the parcel.
-            dest.writeInt(mId);
+            dest.writeLong(mId);
             dest.writeString(mAuthor);
             dest.writeString(mContent);
             dest.writeString(mUrl);
         }
 
         // Returns the review id.
-        public int getId() {
+        public long getId() {
             return mId;
         }
 
@@ -186,7 +186,7 @@ public class Movie implements Parcelable {
     }
 
     // Public constructor.
-    public Movie(int id, String title, String url, String date, double rating,
+    public Movie(long id, String title, String url, String date, double rating,
                  String synopsis, List<Trailer> trailerList, List<Review> reviewList) {
         // Store the movie details data into respective member variables.
         mId = id;
@@ -209,7 +209,7 @@ public class Movie implements Parcelable {
     private Movie(Parcel source) {
         // Extract the movie details data from the parcel and store it into
         // the respective member variables.
-        mId = source.readInt();
+        mId = source.readLong();
         mOriginalTitle = source.readString();
         mPosterPath = source.readString();
         mReleaseDate = source.readString();
@@ -241,7 +241,7 @@ public class Movie implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         // Write the movie details data into the parcel.
-        dest.writeInt(mId);
+        dest.writeLong(mId);
         dest.writeString(mOriginalTitle);
         dest.writeString(mPosterPath);
         dest.writeString(mReleaseDate);
@@ -252,7 +252,7 @@ public class Movie implements Parcelable {
     }
 
     // Returns the movie id.
-    public int getId() {
+    public long getId() {
         return mId;
     }
 
@@ -279,5 +279,15 @@ public class Movie implements Parcelable {
     // Returns the movie plot synopsis.
     public String getOverview() {
         return mOverview;
+    }
+
+    // Returns the list of trailers.
+    public List<Trailer> getTrailerList() {
+        return mTrailerList;
+    }
+
+    // Returns the list of reviews.
+    public List<Review> getReviewList() {
+        return mReviewList;
     }
 }

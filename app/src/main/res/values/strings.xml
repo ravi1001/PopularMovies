@@ -41,8 +41,13 @@
     <string name="err_authentication_failed">No authentication challenges found</string>
     <!-- Exception when query returned zero results -->
     <string name="err_zero_results">Query returned zero results</string>
-    <string name="title_activity_settings2">SettingsActivity2</string>
 
+    <!-- Trailer site youtube -->
+    <string name="trailer_site_youtube">YouTube</string>
+
+
+
+    <string name="title_activity_settings2">SettingsActivity2</string>
     <string name="hello_world">Hello world!</string>
 
 
