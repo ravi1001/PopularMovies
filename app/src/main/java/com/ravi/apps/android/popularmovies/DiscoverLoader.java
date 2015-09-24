@@ -63,6 +63,7 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
     private final String TMDB_ORIGINAL_TITLE = "original_title";
     private final String TMDB_OVERVIEW = "overview";
     private final String TMDB_RELEASE_DATE = "release_date";
+    private final String TMDB_RUNTIME = "runtime";
     private final String TMDB_POSTER_PATH = "poster_path";
     private final String TMDB_VOTE_AVERAGE = "vote_average";
 
@@ -186,16 +187,14 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
                 // Get the JSON object containing a movie.
                 JSONObject jsonMovie = resultsJsonArray.getJSONObject(i);
 
-                // Extract and store the movie data from the JSON object.
+                // Extract and store the movie id and poster path from the JSON object.
                 int id = jsonMovie.getInt(TMDB_ID);
-                String title = jsonMovie.getString(TMDB_ORIGINAL_TITLE);
-                String overview = jsonMovie.getString(TMDB_OVERVIEW);
-                String date = jsonMovie.getString(TMDB_RELEASE_DATE);
-                String poster = TMDB_POSTER_BASE_URL + TMDB_POSTER_SIZE + jsonMovie.getString(TMDB_POSTER_PATH);
-                double vote = jsonMovie.getDouble(TMDB_VOTE_AVERAGE);
+                String poster = TMDB_POSTER_BASE_URL
+                        + TMDB_POSTER_SIZE
+                        + jsonMovie.getString(TMDB_POSTER_PATH);
 
                 // Create the movie data object.
-                Movie movie = new Movie(id, title, poster, date, vote, overview, null, null);
+                Movie movie = new Movie(id, null, poster, null, 0, 0, null, null, null);
 
                 // Add the movie data object to the list.
                 movieList.add(movie);

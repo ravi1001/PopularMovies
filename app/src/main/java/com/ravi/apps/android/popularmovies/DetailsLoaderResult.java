@@ -23,13 +23,14 @@ package com.ravi.apps.android.popularmovies;
 public class DetailsLoaderResult {
 
     // Movie data.
-    private Movie mMovieList;
+    private Movie mMovie;
+
     // Stores the error that occurred during the load operation. Null if no errors.
     private Exception mException;
 
     // Returns the movie data.
     public Movie getData() {
-        return mMovieList;
+        return mMovie;
     }
 
     // Returns the error.
@@ -39,7 +40,7 @@ public class DetailsLoaderResult {
 
     // Sets the movie data.
     public void setData(Movie data) {
-        mMovieList = data;
+        mMovie = data;
     }
 
     // Sets the exception.

@@ -50,8 +50,10 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
     private DetailsLoaderResult mLoaderResult;
 
     // Base URL for the query.
-    private final String TMDB_MOVIE_DETAILS_BASE_URL =
-            "http://api.themoviedb.org/3/movie/" + mMovieId + "?";
+    private final String TMDB_MOVIE_DETAILS_BASE_URL = "http://api.themoviedb.org/3/movie/";
+
+    // Base URL for YouTube trailer.
+    private final String YOU_TUBE_BASE_URL = "https://www.youtube.com/watch?v=";
 
     // Base URL and size for movie poster image.
     private final String TMDB_POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
@@ -70,6 +72,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
     private final String JSON_ORIGINAL_TITLE = "original_title";
     private final String JSON_POSTER_PATH = "poster_path";
     private final String JSON_RELEASE_DATE = "release_date";
+    private final String JSON_RUNTIME = "runtime";
     private final String JSON_VOTE_AVERAGE = "vote_average";
     private final String JSON_OVERVIEW = "overview";
     private final String JSON_VIDEOS = "videos";
@@ -87,6 +90,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
 
         // Save the movie id.
         mMovieId = movieId;
+        Log.e(LOG_TAG, "DetailsLoader()");
     }
 
     /**
@@ -97,6 +101,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
     @Override
     public DetailsLoaderResult loadInBackground() {
 
+        Log.e(LOG_TAG, "loadInBackground");
         DetailsLoaderResult loaderResult = new DetailsLoaderResult();
         Movie movie = null;
 
@@ -106,8 +111,10 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
         try {
             String movieJsonStr = null;
 
+            String base = TMDB_MOVIE_DETAILS_BASE_URL + mMovieId + "?";
+
             // Build the uri for querying data from TMDb api.
-            Uri uri = Uri.parse(TMDB_MOVIE_DETAILS_BASE_URL).buildUpon()
+            Uri uri = Uri.parse(base).buildUpon()
                     .appendQueryParameter(TMDB_API_KEY_PARAM, TMDB_API_KEY)
                     .appendQueryParameter(TMDB_APPEND_TO_RESPONSE_PARAM, TMDB_APPEND_TO_RESPONSE)
                     .build();
@@ -134,7 +141,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
             movieJsonStr = stringBuffer.toString();
 
             // Parse the JSON string and extract the movie data.
-            movie = getMovieListFromJson(movieJsonStr);
+            movie = getMovieDetailsFromJson(movieJsonStr);
 
         } catch (IOException | JSONException e) {
             Log.e(LOG_TAG, "Error: loadInBackground(): " + e.getLocalizedMessage());
@@ -167,7 +174,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
      * Parses the input JSON string and returns a list of movie data. Throws a
      * JSON exception in case of any error.
      */
-    private Movie getMovieListFromJson(String jsonResponseString)
+    private Movie getMovieDetailsFromJson(String jsonResponseString)
             throws JSONException {
 
         // Create the JSON object from the input string.
@@ -178,6 +185,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
         String title = movieJson.getString(JSON_ORIGINAL_TITLE);
         String poster = TMDB_POSTER_BASE_URL + TMDB_POSTER_SIZE + movieJson.getString(JSON_POSTER_PATH);
         String date = movieJson.getString(JSON_RELEASE_DATE);
+        int runtime = movieJson.getInt(JSON_RUNTIME);
         double vote = movieJson.getDouble(JSON_VOTE_AVERAGE);
         String overview = movieJson.getString(JSON_OVERVIEW);
 
@@ -203,8 +211,8 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
                 // Check if the trailer site is youtube.
                 if(trailerSite.equals(getContext().getString(R.string.trailer_site_youtube))) {
                     // Extract the trailer data.
-                    long trailerId = trailerJson.getLong(JSON_ID);
-                    String trailerKey = trailerJson.getString(JSON_KEY);
+                    String trailerId = trailerJson.getString(JSON_ID);
+                    String trailerKey = YOU_TUBE_BASE_URL + trailerJson.getString(JSON_KEY);
                     String trailerName = trailerJson.getString(JSON_NAME);
 
                     // Create the trailer object and add it to the list.
@@ -231,7 +239,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
                 JSONObject reviewJson = reviewsJsonArray.getJSONObject(i);
 
                 // Extract the review data.
-                long reviewId = reviewJson.getLong(JSON_ID);
+                String reviewId = reviewJson.getString(JSON_ID);
                 String reviewAuthor = reviewJson.getString(JSON_AUTHOR);
                 String reviewContent = reviewJson.getString(JSON_CONTENT);
                 String reviewUrl = reviewJson.getString(JSON_URL);
@@ -243,13 +251,15 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
         }
 
         // Create the movie data object.
-        Movie movie = new Movie(id, title, poster, date, vote, overview, trailerList, reviewList);
+        Movie movie = new Movie(id, title, poster, date, runtime, vote, overview, trailerList, reviewList);
 
         return movie;
     }
 
     @Override
     public void deliverResult(DetailsLoaderResult data) {
+
+        Log.e(LOG_TAG, "deliverResult()");
         // Return if the loader was reset.
         if(isReset()) {
             return;
@@ -267,6 +277,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
 
     @Override
     protected void onStartLoading() {
+        Log.e(LOG_TAG, "onStartLoading()");
         // Force load only if results are not available.
         if(mLoaderResult != null) {
             deliverResult(mLoaderResult);
@@ -277,6 +288,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
 
     @Override
     protected void onStopLoading() {
+        Log.e(LOG_TAG, "onStopLoading()");
         cancelLoad();
     }
 
@@ -290,6 +302,8 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
         super.onReset();
 
         onStopLoading();
+
+        Log.e(LOG_TAG, "onReset");
 
         if(mLoaderResult != null) {
             mLoaderResult = null;

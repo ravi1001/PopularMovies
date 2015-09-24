@@ -1,89 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+
+<!-- Displays detailed information for the movie -->
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/load_status_textview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/msg_status_loading"
+        style="@android:style/TextAppearance.Large"
+        android:gravity="center"/>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <!-- Displays the original title -->
+        <TextView
+            android:id="@+id/original_title_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="32sp"
+            android:textColor="#FFFFFF"
+            android:background="@android:color/holo_green_light"
+            android:singleLine="true"
+            android:scrollHorizontally="true"
+            android:gravity="center_vertical"
+            android:padding="4dp"/>
+
+    </HorizontalScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-        <HorizontalScrollView
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <!-- Displays the poster image -->
+                <ImageView
+                    android:id="@+id/poster_imageview"
+                    android:layout_width="130dp"
+                    android:layout_height="190dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_margin="4dp"/>
+
+                <!-- Displays the release date -->
+                <TextView
+                    android:id="@+id/release_date_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@id/poster_imageview"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="24sp"
+                    android:paddingTop="4dp"
+                    android:paddingLeft="4dp"/>
+
+                <!-- Displays the runtime -->
+                <TextView
+                    android:id="@+id/runtime_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/release_date_textview"
+                    android:layout_toRightOf="@id/poster_imageview"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:paddingTop="12dp"
+                    android:paddingLeft="4dp"/>
+
+                <!-- Displays the average rating -->
+                <TextView
+                    android:id="@+id/vote_average_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/runtime_textview"
+                    android:layout_toRightOf="@id/poster_imageview"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingLeft="4dp"/>
+
+                <!-- Mark as favorite button -->
+                <Button
+                    android:id="@+id/mark_favorite_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/vote_average_textview"
+                    android:layout_toRightOf="@id/poster_imageview"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="8sp"
+                    android:text="@string/mark_as_favorite"
+                    android:includeFontPadding="false"
+                    android:padding="0dp"/>
+
+            </RelativeLayout>
+
+        </ScrollView>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fillViewport="true">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <!-- Displays the original title -->
-            <TextView
-                android:id="@+id/original_title_textview"
+            <!-- Plot synopsis -->
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
-                android:textSize="48sp"
-                android:textColor="#FFFFFF"
-                android:background="@android:color/holo_green_light"
-                android:singleLine="true"
-                android:scrollHorizontally="true"
-                android:gravity="center_vertical"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"/>
-        </HorizontalScrollView>
+                android:layout_height="match_parent"
+                android:layout_weight="1.25">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <!-- Displays the plot synopsis -->
+                <TextView
+                    android:id="@+id/overview_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="10sp"
+                    android:padding="4dp"/>
 
-            <!-- Displays the poster image -->
-            <ImageView
-                android:id="@+id/poster_imageview"
-                android:layout_width="160dp"
-                android:layout_height="180dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"/>
+            </ScrollView>
 
-            <!-- Displays the release date -->
-            <TextView
-                android:id="@+id/release_date_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/poster_imageview"
-                android:fontFamily="sans-serif-light"
-                android:textSize="32sp"
-                android:paddingTop="16dp"/>
+            <!-- Displays trailer list -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="1">
 
-            <!-- Displays the average rating -->
-            <TextView
-                android:id="@+id/vote_average_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/release_date_textview"
-                android:layout_toRightOf="@+id/poster_imageview"
-                android:fontFamily="sans-serif-condensed"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:paddingTop="16dp"/>
+                <!-- Displays the trailers label -->
+                <TextView
+                    android:id="@+id/trailers_label_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:text="@string/trailers_label"
+                    android:paddingTop="4dp"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"/>
 
-            <!-- Displays the plot synopsis -->
-            <TextView
-                android:id="@+id/overview_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/release_date_textview"
-                android:fontFamily="sans-serif-light"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:paddingTop="8dp"
-                android:paddingBottom="4dp"
-                android:paddingLeft="24dp"
-                android:paddingRight="16dp"/>
+                <!-- Displays error message when there are no trailers available -->
+                <TextView
+                    android:id="@+id/trailers_empty_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="10sp"
+                    android:text="@string/msg_err_trailers_unavailable"
+                    android:padding="4dp"/>
 
-        </RelativeLayout>
+                <!-- Displays the list of trailers -->
+                <ListView
+                    android:id="@+id/trailers_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </ListView>
+
+            </LinearLayout>
+
+            <!-- Displays review list -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <!-- Displays the reviews label -->
+                <TextView
+                    android:id="@+id/reviews_label_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:text="@string/reviews_label"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"/>
+
+                <!-- Displays error message when there are no reviews available -->
+                <TextView
+                    android:id="@+id/reviews_empty_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="10sp"
+                    android:text="@string/msg_err_reviews_unavailable"
+                    android:padding="4dp"/>
+
+                <!-- Displays the list of reviews -->
+                <ListView
+                    android:id="@+id/reviews_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </ListView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
-</ScrollView>
+
+</LinearLayout>

@@ -21,12 +21,20 @@
 
     <!-- Error message when title data is unavailable -->
     <string name="msg_err_title_unavailable">Title is unavailable</string>
+    <!-- Error message when image is unavailable -->
+    <string name="msg_err_image_unavailable">Image is unavailable</string>
     <!-- Error message when release date data is unavailable -->
     <string name="msg_err_release_date_unavailable">Release date is unavailable</string>
+    <!-- Error message when rating data is unavailable -->
+    <string name="msg_err_runtime_unavailable">Runtime is unavailable</string>
     <!-- Error message when rating data is unavailable -->
     <string name="msg_err_rating_unavailable">Rating is unavailable</string>
     <!-- Error message when overview data is unavailable -->
     <string name="msg_err_overview_unavailable">Overview is unavailable</string>
+    <!-- Error message when trailers data is unavailable -->
+    <string name="msg_err_trailers_unavailable">Trailers are unavailable</string>
+    <!-- Error message when reviews data is unavailable -->
+    <string name="msg_err_reviews_unavailable">Reviews are unavailable</string>
     <!-- Error message when connection to host failed -->
     <string name="msg_err_unknown_host">Unable to connect to remote server.
             Please check your internet connection and try again.</string>
@@ -44,6 +52,17 @@
 
     <!-- Trailer site youtube -->
     <string name="trailer_site_youtube">YouTube</string>
+
+    <!-- Rating denominator -->
+    <string name="rating_denominator">/10</string>
+    <!-- Runtime units -->
+    <string name="runtime_units">" minutes"</string>
+    <!-- Mark as favorite -->
+    <string name="mark_as_favorite">MARK AS\nFAVORITE</string>
+    <!-- Trailers label -->
+    <string name="trailers_label">Trailers:</string>
+    <!-- Reviews label -->
+    <string name="reviews_label">Reviews:</string>
 
 
 
