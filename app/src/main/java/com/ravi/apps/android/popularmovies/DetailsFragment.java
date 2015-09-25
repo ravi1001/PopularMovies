@@ -221,7 +221,7 @@ public class DetailsFragment extends Fragment implements
 
         // Set the intent action and data.
         trailerIntent.setAction(Intent.ACTION_VIEW)
-                .setData(Uri.parse(mTrailersAdapter.getItem(position).getKey()));
+                .setData(Uri.parse(mTrailersAdapter.getItem(position).getUrl()));
 
         // Pass intent to play trailer.
         startActivity(trailerIntent);

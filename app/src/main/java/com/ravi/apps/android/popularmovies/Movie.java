@@ -29,14 +29,13 @@ import java.util.List;
 public class Movie implements Parcelable {
 
     // Detailed movie information.
-    private final long mId;
+    private final int mId;
     private final String mOriginalTitle;
     private final String mPosterPath;
     private final String mReleaseDate;
     private final int mRuntime;
     private final double mVoteAverage;
     private final String mOverview;
-//    private final int mRuntime;
     private final List<Trailer> mTrailerList = new ArrayList<>();
     private final List<Review> mReviewList = new ArrayList<>();
 
@@ -45,15 +44,13 @@ public class Movie implements Parcelable {
      */
     public static class Trailer implements Parcelable {
         // Trailer information.
-        private final String mId;
-        private final String mKey;
+        private final String mUrl;
         private final String mName;
 
         // Public constructor.
-        public Trailer(String id, String key, String name) {
+        public Trailer(String url, String name) {
             // Store the trailer details data into respective member variables.
-            mId = id;
-            mKey = key;
+            mUrl = url;
             mName = name;
         }
 
@@ -61,8 +58,7 @@ public class Movie implements Parcelable {
         private Trailer(Parcel source) {
             // Extract the trailer details data from the parcel and store it into
             // the respective member variables.
-            mId = source.readString();
-            mKey = source.readString();
+            mUrl = source.readString();
             mName = source.readString();
         }
 
@@ -88,19 +84,13 @@ public class Movie implements Parcelable {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             // Write the trailer details data into the parcel.
-            dest.writeString(mId);
-            dest.writeString(mKey);
+            dest.writeString(mUrl);
             dest.writeString(mName);
         }
 
-        // Returns the trailer id.
-        public String getId() {
-            return mId;
-        }
-
-        // Returns the trailer key.
-        public String getKey() {
-            return mKey;
+        // Returns the trailer url.
+        public String getUrl() {
+            return mUrl;
         }
 
         // Returns the trailer name.
@@ -114,28 +104,22 @@ public class Movie implements Parcelable {
      */
     public static class Review implements Parcelable  {
         // Review information.
-        private final String mId;
         private final String mAuthor;
         private final String mContent;
-        private final String mUrl;
 
         // Public constructor.
-        public Review(String id, String author, String content, String url) {
+        public Review(String author, String content) {
             // Store the review details data into respective member variables.
-            mId = id;
             mAuthor = author;
             mContent = content;
-            mUrl = url;
         }
 
         // Private constructor used to re-create the object from the parcel.
         private Review(Parcel source) {
             // Extract the review details data from the parcel and store it into
             // the respective member variables.
-            mId = source.readString();
             mAuthor = source.readString();
             mContent = source.readString();
-            mUrl = source.readString();
         }
 
         // Reference used to recreate the object from the parcel.
@@ -160,15 +144,8 @@ public class Movie implements Parcelable {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             // Write the review details data into the parcel.
-            dest.writeString(mId);
             dest.writeString(mAuthor);
             dest.writeString(mContent);
-            dest.writeString(mUrl);
-        }
-
-        // Returns the review id.
-        public String getId() {
-            return mId;
         }
 
         // Returns the review author.
@@ -180,15 +157,10 @@ public class Movie implements Parcelable {
         public String getContent() {
             return mContent;
         }
-
-        // Returns the review url.
-        public String getUrl() {
-            return mUrl;
-        }
     }
 
     // Public constructor.
-    public Movie(long id, String title, String url, String date, int runtime, double rating,
+    public Movie(int id, String title, String url, String date, int runtime, double rating,
                  String synopsis, List<Trailer> trailerList, List<Review> reviewList) {
         // Store the movie details data into respective member variables.
         mId = id;
@@ -212,7 +184,7 @@ public class Movie implements Parcelable {
     private Movie(Parcel source) {
         // Extract the movie details data from the parcel and store it into
         // the respective member variables.
-        mId = source.readLong();
+        mId = source.readInt();
         mOriginalTitle = source.readString();
         mPosterPath = source.readString();
         mReleaseDate = source.readString();
@@ -245,7 +217,7 @@ public class Movie implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         // Write the movie details data into the parcel.
-        dest.writeLong(mId);
+        dest.writeInt(mId);
         dest.writeString(mOriginalTitle);
         dest.writeString(mPosterPath);
         dest.writeString(mReleaseDate);
@@ -257,7 +229,7 @@ public class Movie implements Parcelable {
     }
 
     // Returns the movie id.
-    public long getId() {
+    public int getId() {
         return mId;
     }
 

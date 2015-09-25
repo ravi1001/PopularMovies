@@ -181,7 +181,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
         JSONObject movieJson = new JSONObject(jsonResponseString);
 
         // Extract and store the movie data from the JSON object.
-        long id = movieJson.getLong(JSON_ID);
+        int id = movieJson.getInt(JSON_ID);
         String title = movieJson.getString(JSON_ORIGINAL_TITLE);
         String poster = TMDB_POSTER_BASE_URL + TMDB_POSTER_SIZE + movieJson.getString(JSON_POSTER_PATH);
         String date = movieJson.getString(JSON_RELEASE_DATE);
@@ -211,12 +211,11 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
                 // Check if the trailer site is youtube.
                 if(trailerSite.equals(getContext().getString(R.string.trailer_site_youtube))) {
                     // Extract the trailer data.
-                    String trailerId = trailerJson.getString(JSON_ID);
-                    String trailerKey = YOU_TUBE_BASE_URL + trailerJson.getString(JSON_KEY);
+                    String trailerUrl = YOU_TUBE_BASE_URL + trailerJson.getString(JSON_KEY);
                     String trailerName = trailerJson.getString(JSON_NAME);
 
                     // Create the trailer object and add it to the list.
-                    Movie.Trailer trailer = new Movie.Trailer(trailerId, trailerKey, trailerName);
+                    Movie.Trailer trailer = new Movie.Trailer(trailerUrl, trailerName);
                     trailerList.add(trailer);
                 }
             }
@@ -239,13 +238,11 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
                 JSONObject reviewJson = reviewsJsonArray.getJSONObject(i);
 
                 // Extract the review data.
-                String reviewId = reviewJson.getString(JSON_ID);
                 String reviewAuthor = reviewJson.getString(JSON_AUTHOR);
                 String reviewContent = reviewJson.getString(JSON_CONTENT);
-                String reviewUrl = reviewJson.getString(JSON_URL);
 
                 // Create the review object and add it to the list.
-                Movie.Review review = new Movie.Review(reviewId, reviewAuthor, reviewContent, reviewUrl);
+                Movie.Review review = new Movie.Review(reviewAuthor, reviewContent);
                 reviewList.add(review);
             }
         }
