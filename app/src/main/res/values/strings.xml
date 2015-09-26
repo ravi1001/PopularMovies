@@ -42,6 +42,8 @@
     <string name="msg_err_authentication_failed">Authentication with remote server failed.</string>
     <!-- Default error message -->
     <string name="msg_err_default">An error occurred while loading data from remote server.</string>
+    <!-- Unknown uri error message -->
+    <string name="msg_err_unknown_uri">Unknown URI: </string>
 
     <!-- Exception when application is unable to connect to the host -->
     <string name="err_unknown_host">Unable to resolve host</string>
@@ -49,6 +51,9 @@
     <string name="err_authentication_failed">No authentication challenges found</string>
     <!-- Exception when query returned zero results -->
     <string name="err_zero_results">Query returned zero results</string>
+    <!-- Exception when insert failed -->
+    <string name="err_insert_failed">Failed to insert row into: </string>
+
 
     <!-- Trailer site youtube -->
     <string name="trailer_site_youtube">YouTube</string>

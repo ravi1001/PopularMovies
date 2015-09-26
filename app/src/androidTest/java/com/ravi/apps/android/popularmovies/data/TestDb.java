@@ -29,7 +29,7 @@ import java.util.HashSet;
 public class TestDb extends AndroidTestCase {
     // Deletes the database.
     void deleteDatabase() {
-        mContext.deleteDatabase(MovieDBHelper.DATABASE_NAME);
+        mContext.deleteDatabase(MovieDbHelper.DATABASE_NAME);
     }
 
     // Starts afresh every time.
@@ -45,8 +45,8 @@ public class TestDb extends AndroidTestCase {
         tableNameHashSet.add(MovieContract.TrailerEntry.TABLE_NAME);
         tableNameHashSet.add(MovieContract.ReviewEntry.TABLE_NAME);
 
-        mContext.deleteDatabase(MovieDBHelper.DATABASE_NAME);
-        SQLiteDatabase db = new MovieDBHelper(this.mContext).getWritableDatabase();
+        mContext.deleteDatabase(MovieDbHelper.DATABASE_NAME);
+        SQLiteDatabase db = new MovieDbHelper(this.mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
 
         // Check if any tables were created.
@@ -142,7 +142,7 @@ public class TestDb extends AndroidTestCase {
     // Tests the movie table.
     public void testMovieTable() throws Throwable {
         // Get reference to writable db.
-        SQLiteDatabase db = new MovieDBHelper(this.mContext).getWritableDatabase();
+        SQLiteDatabase db = new MovieDbHelper(this.mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
 
         // Insert content values into database and get a row id back.
@@ -176,7 +176,7 @@ public class TestDb extends AndroidTestCase {
     // Tests the trailer table.
     public void testTrailerTable() throws Throwable {
         // Get reference to writable db.
-        SQLiteDatabase db = new MovieDBHelper(this.mContext).getWritableDatabase();
+        SQLiteDatabase db = new MovieDbHelper(this.mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
 
         // Insert content values into database and get a row id back.
@@ -206,7 +206,7 @@ public class TestDb extends AndroidTestCase {
     // Tests the review table.
     public void testReviewTable() throws Throwable {
         // Get reference to writable db.
-        SQLiteDatabase db = new MovieDBHelper(this.mContext).getWritableDatabase();
+        SQLiteDatabase db = new MovieDbHelper(this.mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
 
         // Insert content values into database and get a row id back.

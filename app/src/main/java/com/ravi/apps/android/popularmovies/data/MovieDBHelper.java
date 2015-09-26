@@ -27,7 +27,7 @@ import com.ravi.apps.android.popularmovies.data.MovieContract.TrailerEntry;
 /**
  * Creates, upgrades and deletes the local movie database.
  */
-public class MovieDBHelper extends SQLiteOpenHelper {
+public class MovieDbHelper extends SQLiteOpenHelper {
     // Database schema version.
     public static final int DATABASE_VERSION = 1;
 
@@ -78,7 +78,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_REVIEW_TABLE =
             "DROP TABLE IF EXISTS " + ReviewEntry.TABLE_NAME;
 
-    public MovieDBHelper(Context context) {
+    public MovieDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

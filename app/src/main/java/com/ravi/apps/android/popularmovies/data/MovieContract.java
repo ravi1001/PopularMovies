@@ -64,17 +64,30 @@ public class MovieContract {
         // Overview, stored as string.
         public static final String COLUMN_OVERVIEW = "overview";
 
+        // Build the base movie URI.
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
 
+        // Directory content type.
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
 
+        // Item content type.
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
 
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        // Append the movie id to the URI.
+        public static Uri appendMovieIdToUri(int movieId) {
+            return CONTENT_URI.buildUpon().appendPath(((Integer) movieId).toString()).build();
+        }
+
+        // Extract the movie id from the URI.
+        public static int getMovieIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
         }
     }
 
@@ -94,12 +107,15 @@ public class MovieContract {
         // Name, stored as string.
         public static final String COLUMN_NAME = "name";
 
+        // Build the base trailer URI.
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRAILER).build();
 
+        // Directory content type.
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;
 
+        // Item content type.
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;
 
@@ -124,18 +140,20 @@ public class MovieContract {
         // Content, stored as string.
         public static final String COLUMN_CONTENT = "content";
 
+        // Build the base review URI.
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW).build();
 
+        // Directory content type.
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
 
+        // Item content type.
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
 
         public static Uri buildReviewUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
     }
 }

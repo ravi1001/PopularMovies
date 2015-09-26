@@ -211,11 +211,12 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
                 // Check if the trailer site is youtube.
                 if(trailerSite.equals(getContext().getString(R.string.trailer_site_youtube))) {
                     // Extract the trailer data.
+                    String trailerId = trailerJson.getString(JSON_ID);
                     String trailerUrl = YOU_TUBE_BASE_URL + trailerJson.getString(JSON_KEY);
                     String trailerName = trailerJson.getString(JSON_NAME);
 
                     // Create the trailer object and add it to the list.
-                    Movie.Trailer trailer = new Movie.Trailer(trailerUrl, trailerName);
+                    Movie.Trailer trailer = new Movie.Trailer(trailerId, trailerUrl, trailerName);
                     trailerList.add(trailer);
                 }
             }
@@ -238,11 +239,12 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
                 JSONObject reviewJson = reviewsJsonArray.getJSONObject(i);
 
                 // Extract the review data.
+                String reviewId = reviewJson.getString(JSON_ID);
                 String reviewAuthor = reviewJson.getString(JSON_AUTHOR);
                 String reviewContent = reviewJson.getString(JSON_CONTENT);
 
                 // Create the review object and add it to the list.
-                Movie.Review review = new Movie.Review(reviewAuthor, reviewContent);
+                Movie.Review review = new Movie.Review(reviewId, reviewAuthor, reviewContent);
                 reviewList.add(review);
             }
         }

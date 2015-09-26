@@ -31,6 +31,11 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
+        <provider
+            android:authorities="com.ravi.apps.android.popularmovies"
+            android:name=".data.MovieProvider">
+        </provider>
+
     </application>
 
 </manifest>
