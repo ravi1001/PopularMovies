@@ -120,7 +120,7 @@ public class MovieProvider extends ContentProvider {
         final int uriMatch = sUriMatcher.match(uri);
 
         // Create a cursor to hold the result of the database query.
-        Cursor resultCursor = null;
+        Cursor resultCursor;
 
         // Perform appropriate query.
         switch(uriMatch) {

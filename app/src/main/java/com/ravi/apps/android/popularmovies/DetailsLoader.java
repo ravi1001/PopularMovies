@@ -39,7 +39,6 @@ import java.util.List;
  * reviews from the TMDB server.
  */
 public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
-
     // Tag for logging messages.
     public final String LOG_TAG = DetailsLoader.class.getSimpleName();
 
