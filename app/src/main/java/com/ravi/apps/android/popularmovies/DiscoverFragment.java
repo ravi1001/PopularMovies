@@ -71,7 +71,7 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
     private DiscoverAdapter mDiscoverAdapter;
 
     // Favorite movie data adapter.
-    private FavoriteAdapter mFavoriteAdapter;
+    private FavoriteListingAdapter mFavoriteListingAdapter;
 
     // Text view for displaying appropriate user message when the grid is blank.
     private TextView mEmptyGridMessage;
@@ -99,7 +99,7 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
 
         // Create the data adapters.
         mDiscoverAdapter = new DiscoverAdapter(getActivity(), new ArrayList<Movie>());
-        mFavoriteAdapter = new FavoriteAdapter(getActivity(), null, 0);
+        mFavoriteListingAdapter = new FavoriteListingAdapter(getActivity(), null, 0);
 
         // Get the grid view.
         mGridView = (GridView) rootView.findViewById(R.id.discover_gridview);
@@ -303,7 +303,7 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
             // Check if sort order is favorites, if not, then ignore and return.
             if(!mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
                 // Relinquish the cursor attached to the favorite adapter.
-                mFavoriteAdapter.swapCursor(null);
+                mFavoriteListingAdapter.swapCursor(null);
                 return;
             }
 
@@ -317,10 +317,10 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
                 }
 
                 // Set the favorite adapter onto the grid view.
-                mGridView.setAdapter(mFavoriteAdapter);
+                mGridView.setAdapter(mFavoriteListingAdapter);
 
                 // Assign the cursor to the favorite adapter.
-                mFavoriteAdapter.swapCursor(data);
+                mFavoriteListingAdapter.swapCursor(data);
             } else {
                 // Display appropriate error message to user.
                 mEmptyGridMessage.setText(getString(R.string.msg_err_fetch_favorites));
@@ -330,7 +330,7 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             // Relinquish the cursor attached to the favorite adapter.
-            mFavoriteAdapter.swapCursor(null);
+            mFavoriteListingAdapter.swapCursor(null);
         }
     }
 }

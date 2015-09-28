@@ -51,6 +51,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TrailerEntry.TABLE_NAME + " (" +
             TrailerEntry._ID + " INTEGER PRIMARY KEY, " +
             TrailerEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
+            TrailerEntry.COLUMN_TRAILER_ID + " TEXT, " +
             TrailerEntry.COLUMN_URI + " TEXT, " +
             TrailerEntry.COLUMN_NAME + " TEXT, " +
             " FOREIGN KEY (" + TrailerEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
@@ -61,6 +62,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
             ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
             ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
+            ReviewEntry.COLUMN_REVIEW_ID + " TEXT, " +
             ReviewEntry.COLUMN_AUTHOR + " TEXT, " +
             ReviewEntry.COLUMN_CONTENT + " TEXT, " +
             " FOREIGN KEY (" + ReviewEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +

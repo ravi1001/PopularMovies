@@ -18,8 +18,12 @@ package com.ravi.apps.android.popularmovies;
 
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,16 +37,20 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.ravi.apps.android.popularmovies.data.MovieContract.MovieEntry;
+import com.ravi.apps.android.popularmovies.data.MovieContract.ReviewEntry;
+import com.ravi.apps.android.popularmovies.data.MovieContract.TrailerEntry;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Displays detailed information about the movie.
  */
-public class DetailsFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<DetailsLoaderResult>,
-        AdapterView.OnItemClickListener {
+public class DetailsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     // Tag for logging messages.
     public final String LOG_TAG = DetailsFragment.class.getSimpleName();
@@ -50,11 +58,52 @@ public class DetailsFragment extends Fragment implements
     // Key used to get the movie data parcelable from bundle.
     public static final String DISCOVER_MOVIE = "Discover Movie";
 
-    // Loader that asynchronously fetches the movie details data.
-    private static final int LOADER_ID = 1;
+    // Loader to fetch movie details from the TMDB server.
+    private static final int LOADER_DETAILS_ID = 1;
+
+    // Loader to fetch favorite movie details from the database through the content provider.
+    private static final int LOADER_FAVORITE_ID = 2;
+
+    // Details loader callback handler.
+    DetailsLoaderHandler mDetailsLoaderHandler;
+
+    // Favorite loader callback handler.
+    FavoriteLoaderHandler mFavoriteLoaderHandler;
+
+    // Projection for favorite cursor loader.
+    public static final String[] FAVORITE_DETAILS_PROJECTION = {
+            MovieEntry.COLUMN_MOVIE_ID,
+            MovieEntry.COLUMN_ORIGINAL_TITLE,
+            MovieEntry.COLUMN_POSTER_IMAGE,
+            MovieEntry.COLUMN_RELEASE_DATE,
+            MovieEntry.COLUMN_RUNTIME,
+            MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieEntry.COLUMN_OVERVIEW,
+            TrailerEntry.COLUMN_TRAILER_ID,
+            TrailerEntry.COLUMN_URI,
+            TrailerEntry.COLUMN_NAME,
+            ReviewEntry.COLUMN_REVIEW_ID,
+            ReviewEntry.COLUMN_AUTHOR,
+            ReviewEntry.COLUMN_CONTENT
+    };
+
+    // Column indices tied to the favorite cursor loader projection.
+    public static final int COL_MOVIE_ID = 0;
+    public static final int COL_ORIGINAL_TITLE = 1;
+    public static final int COL_POSTER_IMAGE = 2;
+    public static final int COL_RELEASE_DATE = 3;
+    public static final int COL_RUNTIME = 4;
+    public static final int COL_VOTE_AVERAGE = 5;
+    public static final int COL_OVERVIEW = 6;
+    public static final int COL_TRAILER_ID = 7;
+    public static final int COL_URI = 8;
+    public static final int COL_NAME = 9;
+    public static final int COL_REVIEW_ID = 10;
+    public static final int COL_AUTHOR = 11;
+    public static final int COL_CONTENT = 12;
 
     // Holds the movie ID passed in to the fragment.
-    private long mMovieId;
+    private int mMovieId;
 
     // Detailed data for the movie.
     private Movie mMovie;
@@ -80,6 +129,9 @@ public class DetailsFragment extends Fragment implements
     private TextView mReviewsLabelView;
     private TextView mReviewsEmpty;
     private ListView mReviewsView;
+
+    // Poster image byte stream.
+    byte[] mPosterByteStream;
 
     // Reference to the load status text view.
     private TextView mLoadStatusView;
@@ -133,14 +185,26 @@ public class DetailsFragment extends Fragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // Initialize and start the movie details loader.
-        getLoaderManager().initLoader(LOADER_ID, null, this);
-
         // Restore the saved sort order preference.
         if(savedInstanceState != null
                 && savedInstanceState.containsKey(getString(R.string.pref_sort_order_key))) {
-           mSortOrderPreference =
-                   savedInstanceState.getString(getString(R.string.pref_sort_order_key));
+            mSortOrderPreference =
+                    savedInstanceState.getString(getString(R.string.pref_sort_order_key));
+        }
+
+        // Determine the loader to start based on sort order preference.
+        if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
+            // Create the favorite loader callback handler.
+            mFavoriteLoaderHandler = new FavoriteLoaderHandler();
+
+            // Initialize and start the favorite movie details loader.
+            getLoaderManager().initLoader(LOADER_FAVORITE_ID, null, mFavoriteLoaderHandler);
+        } else {
+            // Create the details loader callback handler.
+            mDetailsLoaderHandler = new DetailsLoaderHandler();
+
+            // Initialize and start the movie details loader.
+            getLoaderManager().initLoader(LOADER_DETAILS_ID, null, mDetailsLoaderHandler);
         }
     }
 
@@ -149,7 +213,7 @@ public class DetailsFragment extends Fragment implements
         super.onStart();
 
         // Check if the sort order preference has changed.
-        if(mSortOrderPreference != Utility.getSortOrderPreference(getActivity())) {
+        if(!mSortOrderPreference.equals(Utility.getSortOrderPreference(getActivity()))) {
             // Update the sort order preference flag.
             mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
 
@@ -164,54 +228,6 @@ public class DetailsFragment extends Fragment implements
         outState.putString(getString(R.string.pref_sort_order_key), mSortOrderPreference);
 
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public Loader<DetailsLoaderResult> onCreateLoader(int id, Bundle args) {
-        Log.e(LOG_TAG, "onCreateLoader()");
-
-        // Create and return the movie details loader.
-        return new DetailsLoader(getActivity(), mMovieId);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<DetailsLoaderResult> loader, DetailsLoaderResult data) {
-        Log.e(LOG_TAG, "onLoadFinished()");
-
-        // Clear the adapters.
-        mTrailersAdapter.clear();
-        mReviewsAdapter.clear();
-
-        // Check if an error occurred while loading data.
-        Exception exception = data.getException();
-
-        // Data load successful.
-        if(exception == null) {
-            // Extract and hold the detailed movie data.
-            mMovie = data.getData();
-
-            // Remove the load status text view.
-            mLoadStatusView.setVisibility(View.GONE);
-
-            // Unhide all the remaining views.
-            unhideViews();
-
-            // Validate and set the data onto all the views.
-            setViews();
-
-        } else {
-            // Data load failed. Display appropriate error message to user.
-            mLoadStatusView.setText(Utility.getErrorMessage(getActivity(), exception));
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<DetailsLoaderResult> loader) {
-        Log.e(LOG_TAG, "onLoaderReset()");
-
-        // Clear the adapters.
-        mReviewsAdapter.clear();
-        mTrailersAdapter.clear();
     }
 
     @Override
@@ -304,12 +320,23 @@ public class DetailsFragment extends Fragment implements
             bindErrorTextToView(mOriginalTitleView);
         }
 
-        // Check for errors or invalid poster path data.
-        if(mMovie.getPosterPath() != null
-                && !mMovie.getPosterPath().isEmpty()
-                && !mMovie.getPosterPath().equals("null")) {
-            // Set data for poster image view.
-            bindDataToView(mPosterView);
+        // Check for errors or invalid poster image data based on sort order.
+        if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
+            if(mPosterByteStream != null) {
+                // Get the poster image bitmap from byte array.
+                Bitmap posterBitmap = BitmapFactory.decodeByteArray(mPosterByteStream, 0, mPosterByteStream.length);
+
+                // Set the poster image bitmap into the image view.
+                mPosterView.setImageBitmap(posterBitmap);
+            }
+        } else {
+            // Check for errors or invalid poster path data.
+            if(mMovie.getPosterPath() != null
+                    && !mMovie.getPosterPath().isEmpty()
+                    && !mMovie.getPosterPath().equals("null")) {
+                // Set data for poster image view.
+                bindDataToView(mPosterView);
+            }
         }
 
         // Check for errors or invalid release date data.
@@ -419,6 +446,182 @@ public class DetailsFragment extends Fragment implements
         } else if(textView == mOverviewView) {
             mOverviewView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
             mOverviewView.setText(getText(R.string.msg_err_overview_unavailable));
+        }
+    }
+
+    /**
+     * Loader callback handler for movie details loader, fetching data from TMDB server.
+     */
+    public final class DetailsLoaderHandler
+            implements LoaderManager.LoaderCallbacks<DetailsLoaderResult> {
+
+        @Override
+        public Loader<DetailsLoaderResult> onCreateLoader(int id, Bundle args) {
+            Log.e(LOG_TAG, "onCreateLoader()");
+
+            // Create and return the movie details loader.
+            return new DetailsLoader(getActivity(), mMovieId);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<DetailsLoaderResult> loader, DetailsLoaderResult data) {
+            Log.e(LOG_TAG, "onLoadFinished()");
+
+            // Clear the adapters.
+            mTrailersAdapter.clear();
+            mReviewsAdapter.clear();
+
+            // Check if an error occurred while loading data.
+            Exception exception = data.getException();
+
+            // Data load successful.
+            if(exception == null) {
+                // Extract and hold the detailed movie data.
+                mMovie = data.getData();
+
+                // Remove the load status text view.
+                mLoadStatusView.setVisibility(View.GONE);
+
+                // Unhide all the remaining views.
+                unhideViews();
+
+                // Validate and set the data onto all the views.
+                setViews();
+
+            } else {
+                // Data load failed. Display appropriate error message to user.
+                mLoadStatusView.setText(Utility.getErrorMessage(getActivity(), exception));
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<DetailsLoaderResult> loader) {
+            Log.e(LOG_TAG, "onLoaderReset()");
+
+            // Clear the adapters.
+            mReviewsAdapter.clear();
+            mTrailersAdapter.clear();
+        }
+    }
+
+    /**
+     * Loader callback handler for favorite movie details loader, fetching data from database.
+     */
+    public final class FavoriteLoaderHandler
+            implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            // Get uri after appending movie id.
+            Uri movieWithTrailersAndReviewsUri = MovieEntry.appendMovieIdToUri(mMovieId);
+
+            // Create loader to retrieve favorite movie details from database through content provider.
+            return new CursorLoader(
+                    getActivity(),
+                    movieWithTrailersAndReviewsUri,
+                    FAVORITE_DETAILS_PROJECTION,
+                    null,
+                    null,
+                    null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            // Clear the adapters.
+            mTrailersAdapter.clear();
+            mReviewsAdapter.clear();
+
+            // Check if valid cursor was returned.
+            if(data != null) {
+                // Check if the cursor is empty.
+                if(data.moveToFirst() == false) {
+                    // Display appropriate status message to user and return.
+                    mLoadStatusView.setText(getString(R.string.msg_err_no_favorites));
+                    return;
+                }
+
+                // Extract and hold the detailed movie data.
+                String title = data.getString(COL_ORIGINAL_TITLE);
+                mPosterByteStream = data.getBlob(COL_POSTER_IMAGE);
+                String releaseDate = data.getString(COL_RELEASE_DATE);
+                int runtime = data.getInt(COL_RUNTIME);
+                double rating = data.getDouble(COL_VOTE_AVERAGE);
+                String overview = data.getString(COL_OVERVIEW);
+
+                // Store trailers into a list.
+                List<Movie.Trailer> trailerList = new ArrayList<>();
+
+                // Temporarily hold the unique trailer ids.
+                Set<String> uniqueTrailerId = new HashSet<>();
+
+                // Iterate through the cursor and extract all the trailers.
+                do {
+                    // Extract trailer id.
+                    String trailerId = data.getString(COL_TRAILER_ID);
+
+                    // Check if it's unique.
+                    if(!uniqueTrailerId.add(trailerId)) {
+                        // This trailer id has already been extracted, move to next row.
+                        continue;
+                    }
+
+                    // Extract other trailer data.
+                    String uri = data.getString(COL_URI);
+                    String name = data.getString(COL_NAME);
+
+                    // Add trailer object to list.
+                    trailerList.add(new Movie.Trailer(trailerId, uri, name));
+                } while(data.moveToNext());
+
+
+                // Iterate through the cursor and extract all the trailers.
+                // Store trailers into a list.
+                List<Movie.Review> reviewList = new ArrayList<>();
+
+                // Temporarily hold the unique trailer ids.
+                Set<String> uniqueReviewId = new HashSet<>();
+
+                // Move to first row.
+                data.moveToFirst();
+
+                // Iterate through the cursor and extract all the review.
+                do {
+                    // Extract review id.
+                    String reviewId = data.getString(COL_REVIEW_ID);
+
+                    // Check if it's unique.
+                    if(!uniqueReviewId.add(reviewId)) {
+                        // This trailer id has already been extracted, move to next row.
+                        continue;
+                    }
+
+                    // Extract other review data.
+                    String author = data.getString(COL_AUTHOR);
+                    String content = data.getString(COL_CONTENT);
+
+                    // Add review object to list.
+                    reviewList.add(new Movie.Review(reviewId, author, content));
+                } while(data.moveToNext());
+
+                // Remove the load status text view.
+                mLoadStatusView.setVisibility(View.GONE);
+
+                // Unhide all the remaining views.
+                unhideViews();
+
+                // Validate and set the data onto all the views.
+                setViews();
+            } else {
+                // Display appropriate error message to user.
+                mLoadStatusView.setText(getString(R.string.msg_err_fetch_favorites));
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            // Clear the adapters.
+            mTrailersAdapter.clear();
+            mReviewsAdapter.clear();
         }
     }
 }

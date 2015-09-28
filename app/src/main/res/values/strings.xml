@@ -5,7 +5,7 @@
     <string name="title_activity_settings">Settings</string>
 
     <!-- TMDB API key -->
-    <string name="tmdb_api_key">aee988163796b8e2426340d2a78ef4cc</string>
+    <string name="tmdb_api_key">key</string>
 
     <!-- Key for sort order preference -->
     <string name="pref_sort_order_key" translatable="false">sort_order</string>

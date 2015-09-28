@@ -101,6 +101,9 @@ public class MovieContract {
         // Foreign key into the movie table, stored as int.
         public static final String COLUMN_MOVIE_KEY = "movie_key";
 
+        // Trailer id, stored as string.
+        public static final String COLUMN_TRAILER_ID = "trailer_id";
+
         // URI for the YouTube trailer, stored as string.
         public static final String COLUMN_URI = "uri";
 
@@ -133,6 +136,9 @@ public class MovieContract {
 
         // Foreign key into the movie table, stored as int.
         public static final String COLUMN_MOVIE_KEY = "movie_key";
+
+        // Review id, stored as string.
+        public static final String COLUMN_REVIEW_ID = "review_id";
 
         // Author, stored as string.
         public static final String COLUMN_AUTHOR = "author";
