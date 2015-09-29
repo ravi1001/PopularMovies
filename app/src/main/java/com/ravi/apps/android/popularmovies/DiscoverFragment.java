@@ -53,13 +53,15 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
 
     // Projection for favorite cursor loader.
     public static final String[] FAVORITE_PROJECTION = {
+            MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_POSTER_IMAGE
     };
 
     // Column indices tied to the favorite cursor loader projection.
-    public static final int COL_MOVIE_ID = 0;
-    public static final int COL_POSTER_IMAGE = 1;
+    public static final int COL_ID = 0;
+    public static final int COL_MOVIE_ID = 1;
+    public static final int COL_POSTER_IMAGE = 2;
 
     // Grid view item index key.
     private static String GRID_INDEX_KEY = "Grid index key";
@@ -288,6 +290,9 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            // Sort order for the query.
+            String sortOrder = MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " DESC";
+
             // Create loader to retrieve favorite movies from database through content provider.
             return new CursorLoader(
                     getActivity(),
@@ -295,7 +300,7 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
                     FAVORITE_PROJECTION,
                     null,
                     null,
-                    null);
+                    sortOrder);
         }
 
         @Override

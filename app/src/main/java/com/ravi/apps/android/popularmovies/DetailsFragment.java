@@ -24,6 +24,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,12 +37,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ravi.apps.android.popularmovies.data.MovieContract.MovieEntry;
 import com.ravi.apps.android.popularmovies.data.MovieContract.ReviewEntry;
 import com.ravi.apps.android.popularmovies.data.MovieContract.TrailerEntry;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -50,13 +54,17 @@ import java.util.Set;
 /**
  * Displays detailed information about the movie.
  */
-public class DetailsFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class DetailsFragment extends Fragment
+        implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     // Tag for logging messages.
     public final String LOG_TAG = DetailsFragment.class.getSimpleName();
 
     // Key used to get the movie data parcelable from bundle.
     public static final String DISCOVER_MOVIE = "Discover Movie";
+
+    // Key used to pass the favorite movie data to the intent service.
+    public static final String FAVORITE_MOVIE = "Favorite Movie";
 
     // Loader to fetch movie details from the TMDB server.
     private static final int LOADER_DETAILS_ID = 1;
@@ -72,6 +80,7 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
     // Projection for favorite cursor loader.
     public static final String[] FAVORITE_DETAILS_PROJECTION = {
+            MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
             MovieEntry.COLUMN_MOVIE_ID,
             MovieEntry.COLUMN_ORIGINAL_TITLE,
             MovieEntry.COLUMN_POSTER_IMAGE,
@@ -88,19 +97,20 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
     };
 
     // Column indices tied to the favorite cursor loader projection.
-    public static final int COL_MOVIE_ID = 0;
-    public static final int COL_ORIGINAL_TITLE = 1;
-    public static final int COL_POSTER_IMAGE = 2;
-    public static final int COL_RELEASE_DATE = 3;
-    public static final int COL_RUNTIME = 4;
-    public static final int COL_VOTE_AVERAGE = 5;
-    public static final int COL_OVERVIEW = 6;
-    public static final int COL_TRAILER_ID = 7;
-    public static final int COL_URI = 8;
-    public static final int COL_NAME = 9;
-    public static final int COL_REVIEW_ID = 10;
-    public static final int COL_AUTHOR = 11;
-    public static final int COL_CONTENT = 12;
+    public static final int COL_ID = 0;
+    public static final int COL_MOVIE_ID = 1;
+    public static final int COL_ORIGINAL_TITLE = 2;
+    public static final int COL_POSTER_IMAGE = 3;
+    public static final int COL_RELEASE_DATE = 4;
+    public static final int COL_RUNTIME = 5;
+    public static final int COL_VOTE_AVERAGE = 6;
+    public static final int COL_OVERVIEW = 7;
+    public static final int COL_TRAILER_ID = 8;
+    public static final int COL_URI = 9;
+    public static final int COL_NAME = 10;
+    public static final int COL_REVIEW_ID = 11;
+    public static final int COL_AUTHOR = 12;
+    public static final int COL_CONTENT = 13;
 
     // Holds the movie ID passed in to the fragment.
     private int mMovieId;
@@ -130,15 +140,13 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
     private TextView mReviewsEmpty;
     private ListView mReviewsView;
 
-    // Poster image byte stream.
-    byte[] mPosterByteStream;
-
     // Reference to the load status text view.
     private TextView mLoadStatusView;
 
     ViewGroup mViewGroup;
 
     public DetailsFragment() {
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -168,12 +176,20 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
         // Set the trailer list view item click listener.
         mTrailersView.setOnItemClickListener(this);
 
+        // Set the mark as favorite button click listener.
+        mMarkFavoriteView.setOnClickListener(this);
+
         // Set the empty list view messages.
         mTrailersView.setEmptyView(mTrailersEmpty);
         mReviewsView.setEmptyView(mReviewsEmpty);
 
         // Get the current sort order from shared preferences.
         mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
+
+        // Disable mark as favorite button if sort order preference is favorites.
+        if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
+            mMarkFavoriteView.setClickable(false);
+        }
 
         // Hide all views except load status till data is loaded.
         hideViews();
@@ -185,21 +201,31 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        Log.e(LOG_TAG, "onActivityCreated");
+
         // Restore the saved sort order preference.
         if(savedInstanceState != null
                 && savedInstanceState.containsKey(getString(R.string.pref_sort_order_key))) {
             mSortOrderPreference =
                     savedInstanceState.getString(getString(R.string.pref_sort_order_key));
+            Log.e(LOG_TAG, "onActivityCreated: orientation change");
+
         }
 
         // Determine the loader to start based on sort order preference.
         if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
+
+            Log.e(LOG_TAG, "onActivityCreated: start fav loader");
+
             // Create the favorite loader callback handler.
             mFavoriteLoaderHandler = new FavoriteLoaderHandler();
 
             // Initialize and start the favorite movie details loader.
             getLoaderManager().initLoader(LOADER_FAVORITE_ID, null, mFavoriteLoaderHandler);
         } else {
+
+            Log.e(LOG_TAG, "onActivityCreated: start details loader");
+
             // Create the details loader callback handler.
             mDetailsLoaderHandler = new DetailsLoaderHandler();
 
@@ -214,8 +240,7 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
         // Check if the sort order preference has changed.
         if(!mSortOrderPreference.equals(Utility.getSortOrderPreference(getActivity()))) {
-            // Update the sort order preference flag.
-            mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
+            Log.e(LOG_TAG, "onStart: sort order changed");
 
             // Notify the hosting activity of the sort order change event.
             ((OnSortPreferenceChangedListener) getActivity()).onSortPreferenceChanged(this);
@@ -243,6 +268,25 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
         startActivity(trailerIntent);
     }
 
+    @Override
+    public void onClick(View v) {
+        // Confirm it's button click event.
+        if(v instanceof Button) {
+
+            // Disallow further clicks and disable button.
+            mMarkFavoriteView.setClickable(false);
+
+            Toast.makeText(getActivity(), "Adding favorite movie into database...", Toast.LENGTH_SHORT).show();
+
+            // Create intent to add movie into database.
+            Intent intent = new Intent(getActivity(), AddFavoriteService.class);
+            intent.putExtra(FAVORITE_MOVIE, mMovie);
+
+            // Send intent to start add favorite intent service.
+            getActivity().startService(intent);
+        }
+    }
+
     /**
      * Public interface that needs to be implemented by the hosting activity to receive
      * notifications from the fragment whenever the user changes the sort order preference.
@@ -258,6 +302,7 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
         mLoadStatusView = (TextView) rootView.findViewById(R.id.load_status_textview);
         mOriginalTitleView = (TextView) rootView.findViewById(R.id.original_title_textview);
         mPosterView = (ImageView) rootView.findViewById(R.id.poster_imageview);
+        mPosterView.setScaleType(ImageView.ScaleType.FIT_XY);
         mReleaseDateView = (TextView) rootView.findViewById(R.id.release_date_textview);
         mRuntimeView = (TextView) rootView.findViewById(R.id.runtime_textview);
         mVoteAverageView = (TextView) rootView.findViewById(R.id.vote_average_textview);
@@ -322,9 +367,10 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
         // Check for errors or invalid poster image data based on sort order.
         if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
-            if(mPosterByteStream != null) {
+            if(mMovie.getPosterByteArray() != null && mMovie.getPosterByteArray().length != 0) {
                 // Get the poster image bitmap from byte array.
-                Bitmap posterBitmap = BitmapFactory.decodeByteArray(mPosterByteStream, 0, mPosterByteStream.length);
+                Bitmap posterBitmap = BitmapFactory.decodeByteArray(
+                        mMovie.getPosterByteArray(), 0, mMovie.getPosterByteArray().length);
 
                 // Set the poster image bitmap into the image view.
                 mPosterView.setImageBitmap(posterBitmap);
@@ -374,7 +420,7 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
         }
 
         // Check for errors or invalid trailer data.
-        if(mMovie.getTrailerList() != null) {
+        if(mMovie.getTrailerList() != null && mMovie.getTrailerList().size() != 0) {
             // Add data into adapter for trailers list view.
             bindDataToView(mTrailersView);
         } else {
@@ -383,7 +429,7 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
         }
 
         // Check for errors or invalid reviews data.
-        if(mMovie.getReviewList() != null) {
+        if(mMovie.getReviewList() != null && mMovie.getReviewList().size() != 0) {
             // Add data into adapter for reviews list view.
             bindDataToView(mReviewsView);
         } else {
@@ -404,8 +450,28 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
             // Load the poster image using Picasso.
             Picasso.with(getActivity())
                     .load(mMovie.getPosterPath())
-                    .fit()
-                    .into(mPosterView);
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            // Get byte array from poster bitmap.
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+                            // Set the poster byte array in the movie object.
+                            mMovie.setPosterByteArray(stream.toByteArray());
+
+                            // Set poster bitmap onto the image view.
+                            mPosterView.setImageBitmap(bitmap);
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {
+                        }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        }
+                    });
         } else if(view == mReleaseDateView) {
             // Bind the release date.
             mReleaseDateView.setText(mMovie.getReleaseDate().substring(0, 4));
@@ -457,7 +523,7 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
         @Override
         public Loader<DetailsLoaderResult> onCreateLoader(int id, Bundle args) {
-            Log.e(LOG_TAG, "onCreateLoader()");
+            Log.e(LOG_TAG, "onCreateLoader: Details loader");
 
             // Create and return the movie details loader.
             return new DetailsLoader(getActivity(), mMovieId);
@@ -465,7 +531,7 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
         @Override
         public void onLoadFinished(Loader<DetailsLoaderResult> loader, DetailsLoaderResult data) {
-            Log.e(LOG_TAG, "onLoadFinished()");
+            Log.e(LOG_TAG, "onLoadFinished: Details loader");
 
             // Clear the adapters.
             mTrailersAdapter.clear();
@@ -496,7 +562,7 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
         @Override
         public void onLoaderReset(Loader<DetailsLoaderResult> loader) {
-            Log.e(LOG_TAG, "onLoaderReset()");
+            Log.e(LOG_TAG, "onLoaderReset: details loader");
 
             // Clear the adapters.
             mReviewsAdapter.clear();
@@ -512,6 +578,8 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            Log.e(LOG_TAG, "onCreateLoader: favorite loader");
+
             // Get uri after appending movie id.
             Uri movieWithTrailersAndReviewsUri = MovieEntry.appendMovieIdToUri(mMovieId);
 
@@ -527,6 +595,8 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            Log.e(LOG_TAG, "onLoadFinished: favorite loader");
+
             // Clear the adapters.
             mTrailersAdapter.clear();
             mReviewsAdapter.clear();
@@ -541,8 +611,9 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
                 }
 
                 // Extract and hold the detailed movie data.
+                int movieId = data.getInt(COL_MOVIE_ID);
                 String title = data.getString(COL_ORIGINAL_TITLE);
-                mPosterByteStream = data.getBlob(COL_POSTER_IMAGE);
+                byte[] posterByteArray = data.getBlob(COL_POSTER_IMAGE);
                 String releaseDate = data.getString(COL_RELEASE_DATE);
                 int runtime = data.getInt(COL_RUNTIME);
                 double rating = data.getDouble(COL_VOTE_AVERAGE);
@@ -559,7 +630,10 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
                     // Extract trailer id.
                     String trailerId = data.getString(COL_TRAILER_ID);
 
-                    // Check if it's unique.
+                    if(trailerId == null)
+                        continue;
+
+                    // Check if it's already added.
                     if(!uniqueTrailerId.add(trailerId)) {
                         // This trailer id has already been extracted, move to next row.
                         continue;
@@ -573,9 +647,7 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
                     trailerList.add(new Movie.Trailer(trailerId, uri, name));
                 } while(data.moveToNext());
 
-
-                // Iterate through the cursor and extract all the trailers.
-                // Store trailers into a list.
+                // Store reviews into a list.
                 List<Movie.Review> reviewList = new ArrayList<>();
 
                 // Temporarily hold the unique trailer ids.
@@ -584,10 +656,13 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
                 // Move to first row.
                 data.moveToFirst();
 
-                // Iterate through the cursor and extract all the review.
+                // Iterate through the cursor and extract all the reviews.
                 do {
                     // Extract review id.
                     String reviewId = data.getString(COL_REVIEW_ID);
+
+                    if(reviewId == null)
+                        continue;
 
                     // Check if it's unique.
                     if(!uniqueReviewId.add(reviewId)) {
@@ -602,6 +677,10 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
                     // Add review object to list.
                     reviewList.add(new Movie.Review(reviewId, author, content));
                 } while(data.moveToNext());
+
+                // Create movie object with extracted data.
+                mMovie = new Movie(movieId, title, null, posterByteArray, releaseDate,
+                        runtime, rating, overview, trailerList, reviewList);
 
                 // Remove the load status text view.
                 mLoadStatusView.setVisibility(View.GONE);
@@ -619,6 +698,8 @@ public class DetailsFragment extends Fragment implements AdapterView.OnItemClick
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
+            Log.e(LOG_TAG, "onLoaderReset: favorite loader");
+
             // Clear the adapters.
             mTrailersAdapter.clear();
             mReviewsAdapter.clear();

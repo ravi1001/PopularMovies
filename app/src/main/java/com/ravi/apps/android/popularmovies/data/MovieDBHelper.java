@@ -29,7 +29,7 @@ import com.ravi.apps.android.popularmovies.data.MovieContract.TrailerEntry;
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
     // Database schema version.
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     // Database name.
     public static final String DATABASE_NAME = "movie.db";
@@ -38,35 +38,40 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_MOVIE_TABLE =
             "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
             MovieEntry._ID + " INTEGER PRIMARY KEY, " +
-            MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL UNIQUE, " +
+            MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
             MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT, " +
             MovieEntry.COLUMN_POSTER_IMAGE + " BLOB, " +
             MovieEntry.COLUMN_RELEASE_DATE + " TEXT, " +
             MovieEntry.COLUMN_RUNTIME + " INTEGER, " +
             MovieEntry.COLUMN_VOTE_AVERAGE + " REAL, " +
-            MovieEntry.COLUMN_OVERVIEW + " TEXT);";
+            MovieEntry.COLUMN_OVERVIEW + " TEXT, " +
+            "UNIQUE (" + MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
     // SQL statement for creating the trailer table.
     private static final String SQL_CREATE_TRAILER_TABLE =
             "CREATE TABLE " + TrailerEntry.TABLE_NAME + " (" +
             TrailerEntry._ID + " INTEGER PRIMARY KEY, " +
             TrailerEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
-            TrailerEntry.COLUMN_TRAILER_ID + " TEXT, " +
+            TrailerEntry.COLUMN_TRAILER_ID + " TEXT NOT NULL, " +
             TrailerEntry.COLUMN_URI + " TEXT, " +
             TrailerEntry.COLUMN_NAME + " TEXT, " +
             " FOREIGN KEY (" + TrailerEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
-            MovieEntry.TABLE_NAME + " (" + MovieEntry.COLUMN_MOVIE_ID + "));";
+            MovieEntry.TABLE_NAME + " (" + MovieEntry.COLUMN_MOVIE_ID + ") " +
+            "UNIQUE (" + TrailerEntry.COLUMN_TRAILER_ID + ") ON CONFLICT REPLACE);";
+
 
     // SQL statement for creating the review table.
     private static final String SQL_CREATE_REVIEW_TABLE =
             "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
             ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
             ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
-            ReviewEntry.COLUMN_REVIEW_ID + " TEXT, " +
+            ReviewEntry.COLUMN_REVIEW_ID + " TEXT NOT NULL, " +
             ReviewEntry.COLUMN_AUTHOR + " TEXT, " +
             ReviewEntry.COLUMN_CONTENT + " TEXT, " +
             " FOREIGN KEY (" + ReviewEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
-            MovieEntry.TABLE_NAME + " (" + MovieEntry.COLUMN_MOVIE_ID + "));";
+            MovieEntry.TABLE_NAME + " (" + MovieEntry.COLUMN_MOVIE_ID + ") " +
+            "UNIQUE (" + ReviewEntry.COLUMN_REVIEW_ID + ") ON CONFLICT REPLACE);";
+
 
     // SQL statement for deleting the movie table.
     private static final String SQL_DELETE_MOVIE_TABLE =
@@ -101,5 +106,10 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
         // Create the database with new schema.
         onCreate(db);
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        onUpgrade(db, oldVersion, newVersion);
     }
 }

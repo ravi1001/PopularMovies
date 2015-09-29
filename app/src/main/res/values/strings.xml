@@ -39,17 +39,20 @@
     <string name="msg_err_reviews_unavailable">Reviews are unavailable</string>
     <!-- Error message when connection to host failed -->
     <string name="msg_err_unknown_host">Unable to connect to remote server.
-            Please check your internet connection and try again</string>
+            Please check your internet connection and try again.</string>
     <!-- Error message when authentication with host failed -->
-    <string name="msg_err_authentication_failed">Authentication with remote server failed</string>
+    <string name="msg_err_authentication_failed">Authentication with remote server failed.</string>
     <!-- Default error message -->
-    <string name="msg_err_default">An error occurred while loading data from remote server</string>
+    <string name="msg_err_default">An error occurred while loading data from remote server.</string>
     <!-- Unknown uri error message -->
     <string name="msg_err_unknown_uri">Unknown URI: </string>
     <!-- No favorite movies in database error message -->
-    <string name="msg_err_no_favorites">No favorite movies found in the database</string>
+    <string name="msg_err_no_favorites">No favorite movies found in the database.</string>
     <!-- Error fetching favorite movies from database -->
-    <string name="msg_err_fetch_favorites">An error occurred while fetching favorite movies from the database</string>
+    <string name="msg_err_fetch_favorites">An error occurred fetching favorite movies from database.</string>
+    <!-- Error fetching favorite movie details from database -->
+    <string name="msg_err_fetch_favorite_details">An error occurred fetching favorite movie details from database.</string>
+
 
     <!-- Exception when application is unable to connect to the host -->
     <string name="err_unknown_host">Unable to resolve host</string>
@@ -70,10 +73,14 @@
     <string name="runtime_units">" minutes"</string>
     <!-- Mark as favorite -->
     <string name="mark_as_favorite">MARK AS\nFAVORITE</string>
+    <!-- Unmark from favorite -->
+    <string name="unmark_from_favorite">UNMARK FROM\nFAVORITE</string>
     <!-- Trailers label -->
     <string name="trailers_label">Trailers:</string>
     <!-- Reviews label -->
     <string name="reviews_label">Reviews:</string>
+    <!-- Reviews label -->
+    <string name="add_fav_service">Reviews:</string>
 
 
 

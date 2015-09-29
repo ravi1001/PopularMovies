@@ -45,7 +45,7 @@ public class FavoriteListingAdapter extends CursorAdapter {
         int movieId = cursor.getInt(DiscoverFragment.COL_MOVIE_ID);
 
         // Create a movie object with the extracted movie id and return it.
-        Movie movie = new Movie(movieId, null, null, null, 0, 0, null, null, null);
+        Movie movie = new Movie(movieId, null, null, null, null, 0, 0, null, null, null);
 
         return movie;
     }
@@ -61,6 +61,9 @@ public class FavoriteListingAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        // Get the image view.
+        ImageView posterImage = (ImageView) view;
+
         // Get the poster image blob from cursor.
         byte[] posterByteStream = cursor.getBlob(DiscoverFragment.COL_POSTER_IMAGE);
 
@@ -68,6 +71,7 @@ public class FavoriteListingAdapter extends CursorAdapter {
         Bitmap posterBitmap = BitmapFactory.decodeByteArray(posterByteStream, 0, posterByteStream.length);
 
         // Set the poster image bitmap into the image view.
-        ((ImageView) view).setImageBitmap(posterBitmap);
+        posterImage.setImageBitmap(posterBitmap);
+        posterImage.setScaleType(ImageView.ScaleType.FIT_XY);
     }
 }

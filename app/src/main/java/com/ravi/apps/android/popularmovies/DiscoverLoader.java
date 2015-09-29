@@ -194,7 +194,7 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
                         + jsonMovie.getString(TMDB_POSTER_PATH);
 
                 // Create the movie data object.
-                Movie movie = new Movie(id, null, poster, null, 0, 0, null, null, null);
+                Movie movie = new Movie(id, null, poster, null, null, 0, 0, null, null, null);
 
                 // Add the movie data object to the list.
                 movieList.add(movie);

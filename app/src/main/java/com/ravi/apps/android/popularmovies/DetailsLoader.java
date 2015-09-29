@@ -249,7 +249,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
         }
 
         // Create the movie data object.
-        Movie movie = new Movie(id, title, poster, date, runtime, vote, overview, trailerList, reviewList);
+        Movie movie = new Movie(id, title, poster, null, date, runtime, vote, overview, trailerList, reviewList);
 
         return movie;
     }

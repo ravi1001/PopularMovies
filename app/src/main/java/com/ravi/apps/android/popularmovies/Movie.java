@@ -32,6 +32,7 @@ public class Movie implements Parcelable {
     private final int mId;
     private final String mOriginalTitle;
     private final String mPosterPath;
+    private byte[] mPosterByteArray;
     private final String mReleaseDate;
     private final int mRuntime;
     private final double mVoteAverage;
@@ -178,12 +179,17 @@ public class Movie implements Parcelable {
     }
 
     // Public constructor.
-    public Movie(int id, String title, String url, String date, int runtime, double rating,
+    public Movie(int id, String title, String url, byte[] poster, String date, int runtime, double rating,
                  String synopsis, List<Trailer> trailerList, List<Review> reviewList) {
         // Store the movie details data into respective member variables.
         mId = id;
         mOriginalTitle = title;
         mPosterPath = url;
+        if(poster != null) {
+            mPosterByteArray = poster;
+        } else {
+            mPosterByteArray = new byte[0];
+        }
         mReleaseDate = date;
         mRuntime = runtime;
         mVoteAverage = rating;
@@ -205,6 +211,8 @@ public class Movie implements Parcelable {
         mId = source.readInt();
         mOriginalTitle = source.readString();
         mPosterPath = source.readString();
+        mPosterByteArray = new byte[source.readInt()];
+        source.readByteArray(mPosterByteArray);
         mReleaseDate = source.readString();
         mRuntime = source.readInt();
         mVoteAverage = source.readDouble();
@@ -238,6 +246,8 @@ public class Movie implements Parcelable {
         dest.writeInt(mId);
         dest.writeString(mOriginalTitle);
         dest.writeString(mPosterPath);
+        dest.writeInt(mPosterByteArray.length);
+        dest.writeByteArray(mPosterByteArray);
         dest.writeString(mReleaseDate);
         dest.writeInt(mRuntime);
         dest.writeDouble(mVoteAverage);
@@ -259,6 +269,16 @@ public class Movie implements Parcelable {
     // Returns the movie poster path.
     public String getPosterPath() {
         return mPosterPath;
+    }
+
+    // Returns the movie poster stored as a byte array.
+    public byte[] getPosterByteArray() {
+        return mPosterByteArray;
+    }
+
+    // Sets the movie poster as a byte array.
+    public void setPosterByteArray(byte[] poster) {
+        mPosterByteArray = poster;
     }
 
     // Returns the movie release date.

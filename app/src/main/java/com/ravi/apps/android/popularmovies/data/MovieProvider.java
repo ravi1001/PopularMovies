@@ -60,10 +60,10 @@ public class MovieProvider extends ContentProvider {
 
         // Inner join between movie, trailer and review tables on the movie id column.
         sMovieWithTrailerAndReviewQueryBuilder.setTables(
-                MovieEntry.TABLE_NAME + " INNER JOIN " + TrailerEntry.TABLE_NAME + " ON " +
+                MovieEntry.TABLE_NAME + " LEFT JOIN " + TrailerEntry.TABLE_NAME + " ON " +
                         MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " = " +
                         TrailerEntry.TABLE_NAME + "." + TrailerEntry.COLUMN_MOVIE_KEY +
-                        " INNER JOIN " + ReviewEntry.TABLE_NAME + " ON " +
+                        " LEFT JOIN " + ReviewEntry.TABLE_NAME + " ON " +
                         MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " = " +
                         ReviewEntry.TABLE_NAME + "." + ReviewEntry.COLUMN_MOVIE_KEY );
     }
@@ -181,8 +181,11 @@ public class MovieProvider extends ContentProvider {
             }
         }
 
+        // Set notification.
+        resultCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
         // Close the db.
-        readDb.close();
+//        readDb.close();
 
         return resultCursor;
     }
