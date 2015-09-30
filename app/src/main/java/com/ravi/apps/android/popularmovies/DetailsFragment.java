@@ -29,7 +29,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,7 +41,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ravi.apps.android.popularmovies.data.MovieContract.MovieEntry;
 import com.ravi.apps.android.popularmovies.data.MovieContract.ReviewEntry;
@@ -127,8 +125,11 @@ public class DetailsFragment extends Fragment
     private TrailersAdapter mTrailersAdapter;
     private ReviewsAdapter mReviewsAdapter;
 
-    // Current sort order preference.
+    // Sort order preference.
     private String mSortOrderPreference;
+
+    // Mark as favorite button state.
+    private boolean mMarkAsFavBtnState;
 
     // References to the views being displayed.
     private TextView mOriginalTitleView;
@@ -153,8 +154,6 @@ public class DetailsFragment extends Fragment
 
     // Reference to share action provider for sharing first trailer.
     private ShareActionProvider mShareActionProvider;
-
-    ViewGroup mViewGroup;
 
     public DetailsFragment() {
         setHasOptionsMenu(true);
@@ -197,10 +196,8 @@ public class DetailsFragment extends Fragment
         // Get the current sort order from shared preferences.
         mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
 
-        // Disable mark as favorite button if sort order preference is favorites.
-        if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
-            mMarkFavoriteView.setClickable(false);
-        }
+        // Set to true mark as favorite button state.
+        mMarkAsFavBtnState = true;
 
         // Hide all views except load status till data is loaded.
         hideViews();
@@ -212,31 +209,28 @@ public class DetailsFragment extends Fragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Log.e(LOG_TAG, "onActivityCreated");
-
         // Restore the saved sort order preference.
         if(savedInstanceState != null
                 && savedInstanceState.containsKey(getString(R.string.pref_sort_order_key))) {
             mSortOrderPreference =
                     savedInstanceState.getString(getString(R.string.pref_sort_order_key));
-            Log.e(LOG_TAG, "onActivityCreated: orientation change");
+        }
 
+        // Restore the saved mark as favorite button state.
+        if(savedInstanceState != null
+                && savedInstanceState.containsKey(getString(R.string.mark_fav_btn_state))) {
+            mMarkAsFavBtnState =
+                    savedInstanceState.getBoolean(getString(R.string.mark_fav_btn_state));
         }
 
         // Determine the loader to start based on sort order preference.
         if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
-
-            Log.e(LOG_TAG, "onActivityCreated: start fav loader");
-
             // Create the favorite loader callback handler.
             mFavoriteLoaderHandler = new FavoriteLoaderHandler();
 
             // Initialize and start the favorite movie details loader.
             getLoaderManager().initLoader(LOADER_FAVORITE_ID, null, mFavoriteLoaderHandler);
         } else {
-
-            Log.e(LOG_TAG, "onActivityCreated: start details loader");
-
             // Create the details loader callback handler.
             mDetailsLoaderHandler = new DetailsLoaderHandler();
 
@@ -251,17 +245,22 @@ public class DetailsFragment extends Fragment
 
         // Check if the sort order preference has changed.
         if(!mSortOrderPreference.equals(Utility.getSortOrderPreference(getActivity()))) {
-            Log.e(LOG_TAG, "onStart: sort order changed");
-
             // Notify the hosting activity of the sort order change event.
             ((OnSortPreferenceChangedListener) getActivity()).onSortPreferenceChanged(this);
+        }
+
+        // Disable mark as favorite button if sort order preference is favorites or movie
+        // has already been stored.
+        if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites)) || !mMarkAsFavBtnState) {
+            mMarkFavoriteView.setEnabled(false);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        // Save the current sort order preference.
+        // Save the current sort order preference and button state.
         outState.putString(getString(R.string.pref_sort_order_key), mSortOrderPreference);
+        outState.putBoolean(getString(R.string.mark_fav_btn_state), mMarkAsFavBtnState);
 
         super.onSaveInstanceState(outState);
     }
@@ -283,11 +282,11 @@ public class DetailsFragment extends Fragment
     public void onClick(View v) {
         // Confirm it's button click event.
         if(v instanceof Button) {
+            // Update mark as favorite button flag state.
+            mMarkAsFavBtnState = false;
 
-            // Disallow further clicks and disable button.
-            mMarkFavoriteView.setClickable(false);
-
-            Toast.makeText(getActivity(), "Adding favorite movie into database...", Toast.LENGTH_SHORT).show();
+            // Disable mark as favorite button.
+            mMarkFavoriteView.setEnabled(false);
 
             // Create intent to add movie into database.
             Intent intent = new Intent(getActivity(), AddFavoriteService.class);
@@ -330,16 +329,12 @@ public class DetailsFragment extends Fragment
 
         @Override
         public Loader<DetailsLoaderResult> onCreateLoader(int id, Bundle args) {
-            Log.e(LOG_TAG, "onCreateLoader: Details loader");
-
             // Create and return the movie details loader.
             return new DetailsLoader(getActivity(), mMovieId);
         }
 
         @Override
         public void onLoadFinished(Loader<DetailsLoaderResult> loader, DetailsLoaderResult data) {
-            Log.e(LOG_TAG, "onLoadFinished: Details loader");
-
             // Clear the adapters.
             mTrailersAdapter.clear();
             mReviewsAdapter.clear();
@@ -369,8 +364,6 @@ public class DetailsFragment extends Fragment
 
         @Override
         public void onLoaderReset(Loader<DetailsLoaderResult> loader) {
-            Log.e(LOG_TAG, "onLoaderReset: details loader");
-
             // Clear the adapters.
             mReviewsAdapter.clear();
             mTrailersAdapter.clear();
@@ -385,8 +378,6 @@ public class DetailsFragment extends Fragment
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            Log.e(LOG_TAG, "onCreateLoader: favorite loader");
-
             // Get uri after appending movie id.
             Uri movieWithTrailersAndReviewsUri = MovieEntry.appendMovieIdToUri(mMovieId);
 
@@ -402,8 +393,6 @@ public class DetailsFragment extends Fragment
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            Log.e(LOG_TAG, "onLoadFinished: favorite loader");
-
             // Clear the adapters.
             mTrailersAdapter.clear();
             mReviewsAdapter.clear();
@@ -505,8 +494,6 @@ public class DetailsFragment extends Fragment
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-            Log.e(LOG_TAG, "onLoaderReset: favorite loader");
-
             // Clear the adapters.
             mTrailersAdapter.clear();
             mReviewsAdapter.clear();
@@ -669,18 +656,12 @@ public class DetailsFragment extends Fragment
         if(mMovie.getTrailerList() != null && mMovie.getTrailerList().size() != 0) {
             // Add data into adapter for trailers list view.
             bindDataToView(mTrailersView);
-        } else {
-            // Set error message.
-//            bindErrorTextToView(mTrailersView);
         }
 
         // Check for errors or invalid reviews data.
         if(mMovie.getReviewList() != null && mMovie.getReviewList().size() != 0) {
             // Add data into adapter for reviews list view.
             bindDataToView(mReviewsView);
-        } else {
-            // Set error message.
-//            bindErrorTextToView(mReviewsView);
         }
     }
 

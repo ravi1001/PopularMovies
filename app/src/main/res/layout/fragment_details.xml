@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed"
             android:textSize="32sp"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:background="@android:color/holo_green_light"
             android:singleLine="true"
             android:scrollHorizontally="true"
@@ -43,7 +43,8 @@
 
         <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="8dp">
 
                 <!-- Displays the poster image -->
                 <ImageView
@@ -52,9 +53,7 @@
                     android:layout_height="150dp"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="24dp"/>
+                    android:layout_marginRight="16dp"/>
 
                 <!-- Displays the release date -->
                 <TextView
@@ -65,7 +64,6 @@
                     android:layout_toRightOf="@id/poster_imageview"
                     android:fontFamily="sans-serif-condensed"
                     android:textSize="24sp"
-                    android:paddingTop="8dp"
                     android:paddingLeft="4dp"/>
 
                 <!-- Displays the runtime -->
@@ -115,7 +113,7 @@
                     android:layout_below="@+id/poster_imageview"
                     android:fontFamily="sans-serif-light"
                     android:textSize="10sp"
-                    android:padding="8dp"/>
+                    android:paddingTop="4dp"/>
 
             </RelativeLayout>
 
@@ -125,7 +123,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_weight="1.5">
+        android:layout_weight="1.5"
+        android:padding="8dp">
 
         <!-- Displays the trailers label -->
         <TextView
@@ -135,8 +134,7 @@
             android:fontFamily="sans-serif-condensed"
             android:textAppearance="?android:textAppearanceSmall"
             android:text="@string/trailers_label"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"/>
+            android:paddingBottom="4dp"/>
 
         <!-- Displays error message when there are no trailers available -->
         <TextView
@@ -145,8 +143,7 @@
             android:layout_height="match_parent"
             android:fontFamily="sans-serif-light"
             android:textSize="10sp"
-            android:text="@string/msg_err_trailers_unavailable"
-            android:padding="8dp"/>
+            android:text="@string/msg_err_trailers_unavailable"/>
 
         <!-- Displays the list of trailers -->
         <ListView
@@ -161,7 +158,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_weight="1.5">
+        android:layout_weight="1.5"
+        android:padding="8dp">
 
         <!-- Displays the reviews label -->
         <TextView
@@ -171,8 +169,7 @@
             android:fontFamily="sans-serif-condensed"
             android:textAppearance="?android:textAppearanceSmall"
             android:text="@string/reviews_label"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"/>
+            android:paddingBottom="4dp"/>
 
         <!-- Displays error message when there are no reviews available -->
         <TextView
@@ -181,8 +178,7 @@
             android:layout_height="match_parent"
             android:fontFamily="sans-serif-light"
             android:textSize="10sp"
-            android:text="@string/msg_err_reviews_unavailable"
-            android:padding="8dp"/>
+            android:text="@string/msg_err_reviews_unavailable"/>
 
         <!-- Displays the list of reviews -->
         <ListView

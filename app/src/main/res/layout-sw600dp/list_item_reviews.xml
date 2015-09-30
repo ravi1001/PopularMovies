@@ -4,8 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:padding="8dp">
+    android:minHeight="?android:attr/listPreferredItemHeight">
 
     <!-- Displays the review content -->
     <TextView
@@ -14,8 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:fontFamily="sans-serif-light"
-        android:textSize="10sp"
-        android:paddingRight="8dp"/>
+        android:textAppearance="?android:textAppearanceSmall"
+        android:paddingRight="16dp"/>
 
     <!-- Displays the author name -->
     <TextView
@@ -24,6 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         android:fontFamily="sans-serif-light"
-        android:textSize="10sp"/>
+        android:textAppearance="?android:textAppearanceSmall"/>
 
 </LinearLayout>

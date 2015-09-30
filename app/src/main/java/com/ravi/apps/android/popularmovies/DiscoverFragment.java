@@ -184,7 +184,7 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
         outState.putString(getString(R.string.pref_sort_order_key), mSortOrderPreference);
 
         // Check if any movie was selected, if not save first visible position.
-        if(mIsMovieSelected = false) {
+        if(!mIsMovieSelected) {
             mGridIndex = mGridView.getFirstVisiblePosition();
         }
 
