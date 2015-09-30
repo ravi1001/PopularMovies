@@ -148,6 +148,9 @@ public class DetailsFragment extends Fragment
     // Reference to the load status text view.
     private TextView mLoadStatusView;
 
+    // Reference to load target for picasso.
+    private PicassoTarget mPicassoTarget = new PicassoTarget();
+
     // Reference to share action provider for sharing first trailer.
     private ShareActionProvider mShareActionProvider;
 
@@ -511,6 +514,34 @@ public class DetailsFragment extends Fragment
     }
 
     /**
+     * Provides target for Picasso that loads the poster image from the url
+     * and extracts and stores the poster image byte array.
+     */
+    private final class PicassoTarget implements Target {
+
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            // Set poster bitmap onto the image view.
+            mPosterView.setImageBitmap(bitmap);
+
+            // Get byte array from poster bitmap.
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+            // Set the poster byte array in the movie object.
+            mMovie.setPosterByteArray(stream.toByteArray());
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+        }
+    }
+
+    /**
      * Sets the references to all the views.
      */
     private void setReferencesToViews(View rootView) {
@@ -665,28 +696,7 @@ public class DetailsFragment extends Fragment
             // Load the poster image using Picasso.
             Picasso.with(getActivity())
                     .load(mMovie.getPosterPath())
-                    .into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            // Set poster bitmap onto the image view.
-                            mPosterView.setImageBitmap(bitmap);
-
-                            // Get byte array from poster bitmap.
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-
-                            // Set the poster byte array in the movie object.
-                            mMovie.setPosterByteArray(stream.toByteArray());
-                        }
-
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-                        }
-                    });
+                    .into(mPicassoTarget);
         } else if(view == mReleaseDateView) {
             // Bind the release date.
             mReleaseDateView.setText(mMovie.getReleaseDate().substring(0, 4));
