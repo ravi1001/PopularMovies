@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class ReviewsAdapter extends ArrayAdapter<Movie.Review> {
 
-    // List of trailers.
+    // List of reviews.
     private List<Movie.Review> mReviewList;
 
     public ReviewsAdapter(Context context, List<Movie.Review> reviewList) {
@@ -59,22 +59,40 @@ public class ReviewsAdapter extends ArrayAdapter<Movie.Review> {
 
         // Check if it's a recycled view.
         if(convertView == null) {
-            // Create a new view.
+            // Create a new review list item view.
             view = LayoutInflater.from(getContext())
                     .inflate(R.layout.list_item_reviews, parent, false);
+
+            // Create and set the view holder tag onto the view.
+            ViewHolder viewHolder = new ViewHolder(view);
+            view.setTag(viewHolder);
         } else {
-            // Use the recycled view.
+            // Use the recycled review list item view.
             view = convertView;
         }
 
+        // Get the view holder from the review list item view.
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+
         // Set the review author name.
-        ((TextView) view.findViewById(R.id.review_author_textview))
-                .setText(mReviewList.get(position).getAuthor());
+        viewHolder.authorView.setText(mReviewList.get(position).getAuthor());
 
         // Set the review content.
-        ((TextView) view.findViewById(R.id.review_content_textview))
-                .setText(mReviewList.get(position).getContent());
+        viewHolder.contentView.setText(mReviewList.get(position).getContent());
 
         return view;
+    }
+
+    /**
+     * Serves as a cache of the children views for a review list item view.
+     */
+    public static class ViewHolder {
+        public final TextView authorView;
+        public final TextView contentView;
+
+        public ViewHolder(View view) {
+            authorView = (TextView) view.findViewById(R.id.review_author_textview);
+            contentView = (TextView) view.findViewById(R.id.review_content_textview);
+        }
     }
 }

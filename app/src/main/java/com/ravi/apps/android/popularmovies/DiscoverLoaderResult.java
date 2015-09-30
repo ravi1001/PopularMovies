@@ -26,6 +26,7 @@ public class DiscoverLoaderResult {
 
     // List of movie data.
     private List<Movie> mMovieList;
+
     // Stores the error that occurred during the load operation. Null if no errors.
     private Exception mException;
 

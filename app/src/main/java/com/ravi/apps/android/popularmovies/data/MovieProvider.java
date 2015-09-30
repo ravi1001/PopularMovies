@@ -29,7 +29,6 @@ import com.ravi.apps.android.popularmovies.data.MovieContract.MovieEntry;
 import com.ravi.apps.android.popularmovies.data.MovieContract.TrailerEntry;
 import com.ravi.apps.android.popularmovies.data.MovieContract.ReviewEntry;
 
-
 /**
  * Movie content provider.
  */
@@ -47,7 +46,7 @@ public class MovieProvider extends ContentProvider {
     static final int TRAILER = 200;
     static final int REVIEW = 300;
 
-    // Query builder for inner join on movie, trailer and review tables.
+    // Query builder for join on movie, trailer and review tables.
     private static final SQLiteQueryBuilder sMovieWithTrailerAndReviewQueryBuilder;
 
     // Movie id selection string.
@@ -85,6 +84,7 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+        // Create and hold the movie db helper.
         mMovieDbHelper = new MovieDbHelper(getContext());
         return true;
     }
@@ -184,9 +184,6 @@ public class MovieProvider extends ContentProvider {
         // Set notification.
         resultCursor.setNotificationUri(getContext().getContentResolver(), uri);
 
-        // Close the db.
-//        readDb.close();
-
         return resultCursor;
     }
 
@@ -207,11 +204,17 @@ public class MovieProvider extends ContentProvider {
                 long id = writeDb.insert(MovieEntry.TABLE_NAME, null, values);
 
                 // Check if insert was successful.
-                if (id > 0)
+                if (id > 0) {
                     resultUri = MovieEntry.buildMovieUri(id);
-                else
+                } else {
+                    // Close the db.
+                    writeDb.close();
+
+                    // Throw sql exception.
                     throw new android.database.SQLException(getContext()
                             .getString(R.string.err_insert_failed) + uri);
+                }
+
                 break;
             }
             case TRAILER: {
@@ -219,11 +222,17 @@ public class MovieProvider extends ContentProvider {
                 long id = writeDb.insert(TrailerEntry.TABLE_NAME, null, values);
 
                 // Check if insert was successful.
-                if (id > 0)
+                if (id > 0) {
                     resultUri = TrailerEntry.buildTrailerUri(id);
-                else
+                } else {
+                    // Close the db.
+                    writeDb.close();
+
+                    // Throw sql exception.
                     throw new android.database.SQLException(getContext()
                             .getString(R.string.err_insert_failed) + uri);
+                }
+
                 break;
             }
             case REVIEW: {
@@ -231,14 +240,24 @@ public class MovieProvider extends ContentProvider {
                 long id = writeDb.insert(ReviewEntry.TABLE_NAME, null, values);
 
                 // Check if insert was successful.
-                if (id > 0)
+                if (id > 0) {
                     resultUri = ReviewEntry.buildReviewUri(id);
-                else
+                } else {
+                    // Close the db.
+                    writeDb.close();
+
+                    // Throw sql exception.
                     throw new android.database.SQLException(getContext()
                             .getString(R.string.err_insert_failed) + uri);
+                }
+
                 break;
             }
             default: {
+                // Close the db.
+                writeDb.close();
+
+                // Throw unsupported operation exception.
                 throw new UnsupportedOperationException(getContext()
                         .getString(R.string.msg_err_unknown_uri) + uri);
             }

@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Share action to share the url of the first trailer for the movie -->
     <item
         android:id="@+id/action_share"
-        android:showAsAction="always"
-        android:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
-
-
+        android:title="@string/action_share_trailer"
+        app:showAsAction="always"
+        android:actionProviderClass="android.widget.ShareActionProvider"/>
 </menu>

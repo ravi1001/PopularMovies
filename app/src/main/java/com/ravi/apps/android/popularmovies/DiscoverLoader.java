@@ -60,12 +60,7 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
     // JSON fields in the query response.
     private final String TMDB_RESULTS = "results";
     private final String TMDB_ID = "id";
-    private final String TMDB_ORIGINAL_TITLE = "original_title";
-    private final String TMDB_OVERVIEW = "overview";
-    private final String TMDB_RELEASE_DATE = "release_date";
-    private final String TMDB_RUNTIME = "runtime";
     private final String TMDB_POSTER_PATH = "poster_path";
-    private final String TMDB_VOTE_AVERAGE = "vote_average";
 
     // Base URL and size for movie poster image.
     private final String TMDB_POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
@@ -83,6 +78,7 @@ public class DiscoverLoader extends AsyncTaskLoader<DiscoverLoaderResult> {
     @Override
     public DiscoverLoaderResult loadInBackground() {
 
+        // Create discover loader result object.
         DiscoverLoaderResult loaderResult = new DiscoverLoaderResult();
         List<Movie> movieList = null;
 

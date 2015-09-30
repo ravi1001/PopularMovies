@@ -20,8 +20,6 @@ import android.app.IntentService;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
 
 import com.ravi.apps.android.popularmovies.data.MovieContract;
 
@@ -31,8 +29,6 @@ import java.util.List;
  * Adds a favorite movie into the database through a content provider.
  */
 public class AddFavoriteService extends IntentService {
-
-    public final String LOG_TAG = AddFavoriteService.class.getSimpleName();
 
     // Favorite movie to store in the database.
     private Movie mMovie;
@@ -46,8 +42,6 @@ public class AddFavoriteService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.e(LOG_TAG, "onHandleIntent");
-
         // Get the movie from the parcel.
         mMovie = intent.getParcelableExtra(DetailsFragment.FAVORITE_MOVIE);
 
@@ -61,8 +55,6 @@ public class AddFavoriteService extends IntentService {
     }
 
     private void insertMovie() {
-        Log.e(LOG_TAG, "insertMovie");
-
         // Create content values.
         ContentValues movieValues = new ContentValues();
 
@@ -76,15 +68,10 @@ public class AddFavoriteService extends IntentService {
         movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, mMovie.getOverview());
 
         // Insert into database through content provider.
-        Uri uri = mContentResolver.insert(MovieContract.MovieEntry.CONTENT_URI, movieValues);
-
-        Log.e(LOG_TAG, "insert movie result uri: " + uri);
+        mContentResolver.insert(MovieContract.MovieEntry.CONTENT_URI, movieValues);
     }
 
     private void insertTrailers() {
-        Log.e(LOG_TAG, "insertTrailers");
-
-
         // Get the list of trailers.
         List<Movie.Trailer> trailerList = mMovie.getTrailerList();
 
@@ -118,17 +105,10 @@ public class AddFavoriteService extends IntentService {
         }
 
         // Bulk insert trailers into database through content provider.
-        int rows = mContentResolver.bulkInsert(MovieContract.TrailerEntry.CONTENT_URI, trailers);
-
-        Log.e(LOG_TAG, "no. of trailers inserted: " + rows);
-
+        mContentResolver.bulkInsert(MovieContract.TrailerEntry.CONTENT_URI, trailers);
     }
 
     private void insertReviews() {
-
-        Log.e(LOG_TAG, "insertReviews");
-
-
         // Get the list of reviews.
         List<Movie.Review> reviewList = mMovie.getReviewList();
 
@@ -162,10 +142,6 @@ public class AddFavoriteService extends IntentService {
         }
 
         // Bulk insert reviews into database through content provider.
-        int rows = mContentResolver.bulkInsert(MovieContract.ReviewEntry.CONTENT_URI, reviews);
-
-        Log.e(LOG_TAG, "no. of reviews inserted: " + rows);
-
+        mContentResolver.bulkInsert(MovieContract.ReviewEntry.CONTENT_URI, reviews);
     }
-
 }

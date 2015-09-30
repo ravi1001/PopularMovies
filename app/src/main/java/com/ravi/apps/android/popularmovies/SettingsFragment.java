@@ -65,7 +65,7 @@ public class SettingsFragment extends PreferenceFragment
         updatePreferenceSummary(findPreference(key));
     }
 
-    /*
+    /**
      * Displays the current user preference in the preference summary.
      */
     private void updatePreferenceSummary(Preference preference) {

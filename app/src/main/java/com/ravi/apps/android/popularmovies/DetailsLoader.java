@@ -39,8 +39,9 @@ import java.util.List;
  * reviews from the TMDB server.
  */
 public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
+
     // Tag for logging messages.
-    public final String LOG_TAG = DetailsLoader.class.getSimpleName();
+    private final String LOG_TAG = DetailsLoader.class.getSimpleName();
 
     // Store the movie id.
     private long mMovieId;
@@ -89,7 +90,6 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
 
         // Save the movie id.
         mMovieId = movieId;
-        Log.e(LOG_TAG, "DetailsLoader()");
     }
 
     /**
@@ -100,7 +100,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
     @Override
     public DetailsLoaderResult loadInBackground() {
 
-        Log.e(LOG_TAG, "loadInBackground");
+        // Create loader result object.
         DetailsLoaderResult loaderResult = new DetailsLoaderResult();
         Movie movie = null;
 
@@ -169,7 +169,7 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
         return loaderResult;
     }
 
-    /*
+    /**
      * Parses the input JSON string and returns a list of movie data. Throws a
      * JSON exception in case of any error.
      */
@@ -256,8 +256,6 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
 
     @Override
     public void deliverResult(DetailsLoaderResult data) {
-
-        Log.e(LOG_TAG, "deliverResult()");
         // Return if the loader was reset.
         if(isReset()) {
             return;
@@ -275,7 +273,6 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
 
     @Override
     protected void onStartLoading() {
-        Log.e(LOG_TAG, "onStartLoading()");
         // Force load only if results are not available.
         if(mLoaderResult != null) {
             deliverResult(mLoaderResult);
@@ -286,7 +283,6 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
 
     @Override
     protected void onStopLoading() {
-        Log.e(LOG_TAG, "onStopLoading()");
         cancelLoad();
     }
 
@@ -300,8 +296,6 @@ public class DetailsLoader extends AsyncTaskLoader<DetailsLoaderResult> {
         super.onReset();
 
         onStopLoading();
-
-        Log.e(LOG_TAG, "onReset");
 
         if(mLoaderResult != null) {
             mLoaderResult = null;

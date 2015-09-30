@@ -29,7 +29,7 @@ import com.ravi.apps.android.popularmovies.data.MovieContract.TrailerEntry;
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
     // Database schema version.
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 1;
 
     // Database name.
     public static final String DATABASE_NAME = "movie.db";
@@ -59,7 +59,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             MovieEntry.TABLE_NAME + " (" + MovieEntry.COLUMN_MOVIE_ID + ") " +
             "UNIQUE (" + TrailerEntry.COLUMN_TRAILER_ID + ") ON CONFLICT REPLACE);";
 
-
     // SQL statement for creating the review table.
     private static final String SQL_CREATE_REVIEW_TABLE =
             "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
@@ -71,7 +70,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             " FOREIGN KEY (" + ReviewEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
             MovieEntry.TABLE_NAME + " (" + MovieEntry.COLUMN_MOVIE_ID + ") " +
             "UNIQUE (" + ReviewEntry.COLUMN_REVIEW_ID + ") ON CONFLICT REPLACE);";
-
 
     // SQL statement for deleting the movie table.
     private static final String SQL_DELETE_MOVIE_TABLE =

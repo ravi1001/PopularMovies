@@ -61,7 +61,7 @@ public class DiscoverAdapter extends ArrayAdapter<Movie> {
 
         // Check if it's a recycled view.
         if(convertView == null) {
-            // Create a new image view.
+            // Inflate the image view as it's not a recycled view.
             imageView = (ImageView) LayoutInflater.from(getContext())
                     .inflate(R.layout.fragment_discover_image, parent, false);
         } else {
@@ -70,8 +70,7 @@ public class DiscoverAdapter extends ArrayAdapter<Movie> {
         }
 
         // Extract the movie poster path url.
-        String posterUrl = mMovieList.get(position)
-                .getPosterPath();
+        String posterUrl = mMovieList.get(position).getPosterPath();
 
         // Load the movie poster into image view using Picasso.
         Picasso.with(getContext())

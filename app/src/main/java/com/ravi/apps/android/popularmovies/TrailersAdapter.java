@@ -59,18 +59,35 @@ public class TrailersAdapter extends ArrayAdapter<Movie.Trailer> {
 
         // Check if it's a recycled view.
         if(convertView == null) {
-            // Create a new view.
+            // Create a new trailer list item view.
             view = LayoutInflater.from(getContext())
                     .inflate(R.layout.list_item_trailers, parent, false);
+
+            // Create and set the view holder tag onto the view.
+            ViewHolder viewHolder = new ViewHolder(view);
+            view.setTag(viewHolder);
         } else {
-            // Use the recycled view.
+            // Use the recycled trailer list item view.
             view = convertView;
         }
 
+        // Get the view holder from the trailer list item view.
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+
         // Set the trailer name.
-        TextView name = (TextView) view.findViewById(R.id.trailer_name_textview);
-        name.setText(mTrailerList.get(position).getName());
+        viewHolder.nameView.setText(mTrailerList.get(position).getName());
 
         return view;
+    }
+
+    /**
+     * Serves as a cache of the child view for a trailer list item view.
+     */
+    public static class ViewHolder {
+        public final TextView nameView;
+
+        public ViewHolder(View view) {
+            nameView = (TextView) view.findViewById(R.id.trailer_name_textview);
+        }
     }
 }

@@ -44,6 +44,7 @@ public class Movie implements Parcelable {
      * Stores the movie trailer information and implements the parcelable interface.
      */
     public static class Trailer implements Parcelable {
+
         // Trailer information.
         private final String mId;
         private final String mUrl;
@@ -113,6 +114,7 @@ public class Movie implements Parcelable {
      * Stores the movie review information and implements the parcelable interface.
      */
     public static class Review implements Parcelable  {
+
         // Review information.
         private final String mId;
         private final String mAuthor;

@@ -36,8 +36,6 @@
         </provider>
         <service android:name=".AddFavoriteService">
         </service>
-        <service android:name=".DeleteFavoriteService">
-        </service>
 
     </application>
 

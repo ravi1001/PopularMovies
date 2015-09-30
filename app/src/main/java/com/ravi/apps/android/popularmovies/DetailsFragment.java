@@ -27,9 +27,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -142,6 +147,9 @@ public class DetailsFragment extends Fragment
 
     // Reference to the load status text view.
     private TextView mLoadStatusView;
+
+    // Reference to share action provider for sharing first trailer.
+    private ShareActionProvider mShareActionProvider;
 
     ViewGroup mViewGroup;
 
@@ -287,232 +295,28 @@ public class DetailsFragment extends Fragment
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate menu resource file.
+        inflater.inflate(R.menu.menu_details_fragment, menu);
+
+        // Locate menu item with the share action provider.
+        MenuItem item = menu.findItem(R.id.action_share);
+
+        // Fetch and store the share action provider.
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+
+        if(mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(createTrailerShareIntent("this is a trailer"));
+        }
+    }
+
     /**
      * Public interface that needs to be implemented by the hosting activity to receive
      * notifications from the fragment whenever the user changes the sort order preference.
      */
     public interface OnSortPreferenceChangedListener {
         void onSortPreferenceChanged(DetailsFragment detailsFragment);
-    }
-
-    /**
-     * Sets the references to all the views.
-     */
-    private void setReferencesToViews(View rootView) {
-        mLoadStatusView = (TextView) rootView.findViewById(R.id.load_status_textview);
-        mOriginalTitleView = (TextView) rootView.findViewById(R.id.original_title_textview);
-        mPosterView = (ImageView) rootView.findViewById(R.id.poster_imageview);
-        mPosterView.setScaleType(ImageView.ScaleType.FIT_XY);
-        mReleaseDateView = (TextView) rootView.findViewById(R.id.release_date_textview);
-        mRuntimeView = (TextView) rootView.findViewById(R.id.runtime_textview);
-        mVoteAverageView = (TextView) rootView.findViewById(R.id.vote_average_textview);
-        mMarkFavoriteView = (Button) rootView.findViewById(R.id.mark_favorite_button);
-        mOverviewView = (TextView) rootView.findViewById(R.id.overview_textview);
-        mTrailersLabelView = (TextView) rootView.findViewById(R.id.trailers_label_textview);
-        mTrailersEmpty = (TextView) rootView.findViewById(R.id.trailers_empty_textview);
-        mTrailersView = (ListView) rootView.findViewById(R.id.trailers_listview);
-        mReviewsLabelView = (TextView) rootView.findViewById(R.id.reviews_label_textview);
-        mReviewsEmpty = (TextView) rootView.findViewById(R.id.reviews_empty_textview);
-        mReviewsView = (ListView) rootView.findViewById(R.id.reviews_listview);
-    }
-
-    /**
-     * Hides all the views except load status.
-     */
-    private void hideViews() {
-        mOriginalTitleView.setVisibility(View.INVISIBLE);
-        mPosterView.setVisibility(View.INVISIBLE);
-        mReleaseDateView.setVisibility(View.INVISIBLE);
-        mRuntimeView.setVisibility(View.INVISIBLE);
-        mVoteAverageView.setVisibility(View.INVISIBLE);
-        mMarkFavoriteView.setVisibility(View.INVISIBLE);
-        mOverviewView.setVisibility(View.INVISIBLE);
-        mTrailersLabelView.setVisibility(View.INVISIBLE);
-        mTrailersView.setVisibility(View.INVISIBLE);
-        mReviewsLabelView.setVisibility(View.INVISIBLE);
-        mReviewsView.setVisibility(View.INVISIBLE);
-    }
-
-    /**
-     * Unhides all the views except load status.
-     */
-    private void unhideViews() {
-        mOriginalTitleView.setVisibility(View.VISIBLE);
-        mPosterView.setVisibility(View.VISIBLE);
-        mReleaseDateView.setVisibility(View.VISIBLE);
-        mRuntimeView.setVisibility(View.VISIBLE);
-        mVoteAverageView.setVisibility(View.VISIBLE);
-        mMarkFavoriteView.setVisibility(View.VISIBLE);
-        mOverviewView.setVisibility(View.VISIBLE);
-        mTrailersLabelView.setVisibility(View.VISIBLE);
-        mTrailersView.setVisibility(View.VISIBLE);
-        mReviewsLabelView.setVisibility(View.VISIBLE);
-        mReviewsView.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Validates and sets the appropriate movie data onto all the views.
-     */
-    private void setViews() {
-        // Check for errors or invalid original title data.
-        if(mMovie.getOriginalTitle() != null
-                && !mMovie.getOriginalTitle().isEmpty()
-                && !mMovie.getOriginalTitle().equals("null")) {
-            // Set data for original title view.
-            bindDataToView(mOriginalTitleView);
-        } else {
-            // Set error message.
-            bindErrorTextToView(mOriginalTitleView);
-        }
-
-        // Check for errors or invalid poster image data based on sort order.
-        if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
-            if(mMovie.getPosterByteArray() != null && mMovie.getPosterByteArray().length != 0) {
-                // Get the poster image bitmap from byte array.
-                Bitmap posterBitmap = BitmapFactory.decodeByteArray(
-                        mMovie.getPosterByteArray(), 0, mMovie.getPosterByteArray().length);
-
-                // Set the poster image bitmap into the image view.
-                mPosterView.setImageBitmap(posterBitmap);
-            }
-        } else {
-            // Check for errors or invalid poster path data.
-            if(mMovie.getPosterPath() != null
-                    && !mMovie.getPosterPath().isEmpty()
-                    && !mMovie.getPosterPath().equals("null")) {
-                // Set data for poster image view.
-                bindDataToView(mPosterView);
-            }
-        }
-
-        // Check for errors or invalid release date data.
-        if(mMovie.getReleaseDate() != null
-                && !mMovie.getReleaseDate().isEmpty()
-                && !mMovie.getReleaseDate().equals("null")) {
-            // Set data for release date view.
-            bindDataToView(mReleaseDateView);
-        } else {
-            // Set error message.
-            bindErrorTextToView(mReleaseDateView);
-        }
-
-        // Check for errors or invalid runtime data.
-        if(mMovie.getRuntime() != 0) {
-            // Set data for runtime view.
-            bindDataToView(mRuntimeView);
-        } else {
-            // Set error message.
-            bindErrorTextToView(mRuntimeView);
-        }
-
-        // Set data for average rating view.
-        bindDataToView(mVoteAverageView);
-
-        // Check for errors or invalid overview data.
-        if(mMovie.getOverview() != null
-                && !mMovie.getOverview().isEmpty()
-                && !mMovie.getOverview().equals("null")) {
-            // Set data for plot synopsis view.
-            bindDataToView(mOverviewView);
-        } else {
-            // Set error message.
-            bindErrorTextToView(mOverviewView);
-        }
-
-        // Check for errors or invalid trailer data.
-        if(mMovie.getTrailerList() != null && mMovie.getTrailerList().size() != 0) {
-            // Add data into adapter for trailers list view.
-            bindDataToView(mTrailersView);
-        } else {
-            // Set error message.
-//            bindErrorTextToView(mTrailersView);
-        }
-
-        // Check for errors or invalid reviews data.
-        if(mMovie.getReviewList() != null && mMovie.getReviewList().size() != 0) {
-            // Add data into adapter for reviews list view.
-            bindDataToView(mReviewsView);
-        } else {
-            // Set error message.
-//            bindErrorTextToView(mReviewsView);
-        }
-    }
-
-    /**
-     * Binds the appropriate movie data onto the view passed in.
-     */
-    private void bindDataToView(View view) {
-        // Check which view was passed in.
-        if(view == mOriginalTitleView) {
-            // Bind the original title.
-            mOriginalTitleView.setText(mMovie.getOriginalTitle());
-        } else if(view == mPosterView) {
-            // Load the poster image using Picasso.
-            Picasso.with(getActivity())
-                    .load(mMovie.getPosterPath())
-                    .into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            // Get byte array from poster bitmap.
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-
-                            // Set the poster byte array in the movie object.
-                            mMovie.setPosterByteArray(stream.toByteArray());
-
-                            // Set poster bitmap onto the image view.
-                            mPosterView.setImageBitmap(bitmap);
-                        }
-
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-                        }
-                    });
-        } else if(view == mReleaseDateView) {
-            // Bind the release date.
-            mReleaseDateView.setText(mMovie.getReleaseDate().substring(0, 4));
-        } else if(view == mRuntimeView) {
-            // Bind the runtime.
-            mRuntimeView.setText(((Integer) mMovie.getRuntime()).toString()
-                    + getText(R.string.runtime_units));
-        } else if(view == mVoteAverageView) {
-            // Bind the average rating.
-            mVoteAverageView.setText(((Double) mMovie.getVoteAverage()).toString()
-                    + getText(R.string.rating_denominator));
-        } else if(view == mOverviewView) {
-            // Bind the plot synopsis.
-            mOverviewView.setText(mMovie.getOverview());
-        } else if(view == mTrailersView) {
-            // Add the trailer list to adapter.
-            mTrailersAdapter.addAll(mMovie.getTrailerList());
-        } else if(view == mReviewsView) {
-            // Add the trailer list to adapter.
-            mReviewsAdapter.addAll(mMovie.getReviewList());
-        }
-    }
-
-    /**
-     * Binds the appropriate error text onto the view passed in.
-     */
-    private void bindErrorTextToView(TextView textView) {
-        // Set appropriate error text depending on the view.
-        if(textView == mOriginalTitleView) {
-            mOriginalTitleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            mOriginalTitleView.setText(getText(R.string.msg_err_title_unavailable));
-        } else if(textView == mReleaseDateView) {
-            mReleaseDateView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            mReleaseDateView.setText(getText(R.string.msg_err_release_date_unavailable));
-        } else if(textView == mRuntimeView) {
-            mRuntimeView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            mRuntimeView.setText(R.string.msg_err_runtime_unavailable);
-        } else if(textView == mOverviewView) {
-            mOverviewView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            mOverviewView.setText(getText(R.string.msg_err_overview_unavailable));
-        }
     }
 
     /**
@@ -704,5 +508,244 @@ public class DetailsFragment extends Fragment
             mTrailersAdapter.clear();
             mReviewsAdapter.clear();
         }
+    }
+
+    /**
+     * Sets the references to all the views.
+     */
+    private void setReferencesToViews(View rootView) {
+        mLoadStatusView = (TextView) rootView.findViewById(R.id.load_status_textview);
+        mOriginalTitleView = (TextView) rootView.findViewById(R.id.original_title_textview);
+        mPosterView = (ImageView) rootView.findViewById(R.id.poster_imageview);
+        mPosterView.setScaleType(ImageView.ScaleType.FIT_XY);
+        mReleaseDateView = (TextView) rootView.findViewById(R.id.release_date_textview);
+        mRuntimeView = (TextView) rootView.findViewById(R.id.runtime_textview);
+        mVoteAverageView = (TextView) rootView.findViewById(R.id.vote_average_textview);
+        mMarkFavoriteView = (Button) rootView.findViewById(R.id.mark_favorite_button);
+        mOverviewView = (TextView) rootView.findViewById(R.id.overview_textview);
+        mTrailersLabelView = (TextView) rootView.findViewById(R.id.trailers_label_textview);
+        mTrailersEmpty = (TextView) rootView.findViewById(R.id.trailers_empty_textview);
+        mTrailersView = (ListView) rootView.findViewById(R.id.trailers_listview);
+        mReviewsLabelView = (TextView) rootView.findViewById(R.id.reviews_label_textview);
+        mReviewsEmpty = (TextView) rootView.findViewById(R.id.reviews_empty_textview);
+        mReviewsView = (ListView) rootView.findViewById(R.id.reviews_listview);
+    }
+
+    /**
+     * Hides all the views except load status.
+     */
+    private void hideViews() {
+        mOriginalTitleView.setVisibility(View.INVISIBLE);
+        mPosterView.setVisibility(View.INVISIBLE);
+        mReleaseDateView.setVisibility(View.INVISIBLE);
+        mRuntimeView.setVisibility(View.INVISIBLE);
+        mVoteAverageView.setVisibility(View.INVISIBLE);
+        mMarkFavoriteView.setVisibility(View.INVISIBLE);
+        mOverviewView.setVisibility(View.INVISIBLE);
+        mTrailersLabelView.setVisibility(View.INVISIBLE);
+        mTrailersView.setVisibility(View.INVISIBLE);
+        mReviewsLabelView.setVisibility(View.INVISIBLE);
+        mReviewsView.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * Unhides all the views except load status.
+     */
+    private void unhideViews() {
+        mOriginalTitleView.setVisibility(View.VISIBLE);
+        mPosterView.setVisibility(View.VISIBLE);
+        mReleaseDateView.setVisibility(View.VISIBLE);
+        mRuntimeView.setVisibility(View.VISIBLE);
+        mVoteAverageView.setVisibility(View.VISIBLE);
+        mMarkFavoriteView.setVisibility(View.VISIBLE);
+        mOverviewView.setVisibility(View.VISIBLE);
+        mTrailersLabelView.setVisibility(View.VISIBLE);
+        mTrailersView.setVisibility(View.VISIBLE);
+        mReviewsLabelView.setVisibility(View.VISIBLE);
+        mReviewsView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Validates and sets the appropriate movie data onto all the views.
+     */
+    private void setViews() {
+        // Check for errors or invalid original title data.
+        if(mMovie.getOriginalTitle() != null
+                && !mMovie.getOriginalTitle().isEmpty()
+                && !mMovie.getOriginalTitle().equals("null")) {
+            // Set data for original title view.
+            bindDataToView(mOriginalTitleView);
+        } else {
+            // Set error message.
+            bindErrorTextToView(mOriginalTitleView);
+        }
+
+        // Check for errors or invalid poster image data based on sort order.
+        if(mSortOrderPreference.equals(getString(R.string.pref_sort_order_favorites))) {
+            if(mMovie.getPosterByteArray() != null && mMovie.getPosterByteArray().length != 0) {
+                // Get the poster image bitmap from byte array.
+                Bitmap posterBitmap = BitmapFactory.decodeByteArray(
+                        mMovie.getPosterByteArray(), 0, mMovie.getPosterByteArray().length);
+
+                // Set the poster image bitmap into the image view.
+                mPosterView.setImageBitmap(posterBitmap);
+            }
+        } else {
+            // Check for errors or invalid poster path data.
+            if(mMovie.getPosterPath() != null
+                    && !mMovie.getPosterPath().isEmpty()
+                    && !mMovie.getPosterPath().equals("null")) {
+                // Set data for poster image view.
+                bindDataToView(mPosterView);
+            }
+        }
+
+        // Check for errors or invalid release date data.
+        if(mMovie.getReleaseDate() != null
+                && !mMovie.getReleaseDate().isEmpty()
+                && !mMovie.getReleaseDate().equals("null")) {
+            // Set data for release date view.
+            bindDataToView(mReleaseDateView);
+        } else {
+            // Set error message.
+            bindErrorTextToView(mReleaseDateView);
+        }
+
+        // Check for errors or invalid runtime data.
+        if(mMovie.getRuntime() != 0) {
+            // Set data for runtime view.
+            bindDataToView(mRuntimeView);
+        } else {
+            // Set error message.
+            bindErrorTextToView(mRuntimeView);
+        }
+
+        // Set data for average rating view.
+        bindDataToView(mVoteAverageView);
+
+        // Check for errors or invalid overview data.
+        if(mMovie.getOverview() != null
+                && !mMovie.getOverview().isEmpty()
+                && !mMovie.getOverview().equals("null")) {
+            // Set data for plot synopsis view.
+            bindDataToView(mOverviewView);
+        } else {
+            // Set error message.
+            bindErrorTextToView(mOverviewView);
+        }
+
+        // Check for errors or invalid trailer data.
+        if(mMovie.getTrailerList() != null && mMovie.getTrailerList().size() != 0) {
+            // Add data into adapter for trailers list view.
+            bindDataToView(mTrailersView);
+        } else {
+            // Set error message.
+//            bindErrorTextToView(mTrailersView);
+        }
+
+        // Check for errors or invalid reviews data.
+        if(mMovie.getReviewList() != null && mMovie.getReviewList().size() != 0) {
+            // Add data into adapter for reviews list view.
+            bindDataToView(mReviewsView);
+        } else {
+            // Set error message.
+//            bindErrorTextToView(mReviewsView);
+        }
+    }
+
+    /**
+     * Binds the appropriate movie data onto the view passed in.
+     */
+    private void bindDataToView(View view) {
+        // Check which view was passed in.
+        if(view == mOriginalTitleView) {
+            // Bind the original title.
+            mOriginalTitleView.setText(mMovie.getOriginalTitle());
+        } else if(view == mPosterView) {
+            // Load the poster image using Picasso.
+            Picasso.with(getActivity())
+                    .load(mMovie.getPosterPath())
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            // Set poster bitmap onto the image view.
+                            mPosterView.setImageBitmap(bitmap);
+
+                            // Get byte array from poster bitmap.
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+                            // Set the poster byte array in the movie object.
+                            mMovie.setPosterByteArray(stream.toByteArray());
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {
+                        }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        }
+                    });
+        } else if(view == mReleaseDateView) {
+            // Bind the release date.
+            mReleaseDateView.setText(mMovie.getReleaseDate().substring(0, 4));
+        } else if(view == mRuntimeView) {
+            // Bind the runtime.
+            mRuntimeView.setText(((Integer) mMovie.getRuntime()).toString()
+                    + getText(R.string.runtime_units));
+        } else if(view == mVoteAverageView) {
+            // Bind the average rating.
+            mVoteAverageView.setText(((Double) mMovie.getVoteAverage()).toString()
+                    + getText(R.string.rating_denominator));
+        } else if(view == mOverviewView) {
+            // Bind the plot synopsis.
+            mOverviewView.setText(mMovie.getOverview());
+        } else if(view == mTrailersView) {
+            // Add the trailer list to adapter.
+            mTrailersAdapter.addAll(mMovie.getTrailerList());
+        } else if(view == mReviewsView) {
+            // Add the trailer list to adapter.
+            mReviewsAdapter.addAll(mMovie.getReviewList());
+        }
+    }
+
+    /**
+     * Binds the appropriate error text onto the view passed in.
+     */
+    private void bindErrorTextToView(TextView textView) {
+        // Set appropriate error text depending on the view.
+        if(textView == mOriginalTitleView) {
+            mOriginalTitleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            mOriginalTitleView.setText(getText(R.string.msg_err_title_unavailable));
+        } else if(textView == mReleaseDateView) {
+            mReleaseDateView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            mReleaseDateView.setText(getText(R.string.msg_err_release_date_unavailable));
+        } else if(textView == mRuntimeView) {
+            mRuntimeView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            mRuntimeView.setText(R.string.msg_err_runtime_unavailable);
+        } else if(textView == mOverviewView) {
+            mOverviewView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            mOverviewView.setText(getText(R.string.msg_err_overview_unavailable));
+        }
+    }
+
+    /**
+     * Sets the share intent onto the share action provider
+     */
+    private void setShareIntent(Intent shareIntent) {
+        if(mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
+    }
+
+    private Intent createTrailerShareIntent(String trailerUrl) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_trailer_url) + trailerUrl);
+        sendIntent.setType("text/plain");
+
+        return sendIntent;
     }
 }

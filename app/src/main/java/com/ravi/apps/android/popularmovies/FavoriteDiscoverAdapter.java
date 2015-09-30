@@ -29,9 +29,9 @@ import android.widget.ImageView;
 /**
  * Cursor adapter for favorite movies.
  */
-public class FavoriteListingAdapter extends CursorAdapter {
+public class FavoriteDiscoverAdapter extends CursorAdapter {
 
-    public FavoriteListingAdapter(Context context, Cursor c, int flags) {
+    public FavoriteDiscoverAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
