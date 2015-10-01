@@ -60,9 +60,6 @@ import java.util.Set;
 public class DetailsFragment extends Fragment
         implements AdapterView.OnItemClickListener, View.OnClickListener {
 
-    // Tag for logging messages.
-    public final String LOG_TAG = DetailsFragment.class.getSimpleName();
-
     // Key used to get the movie data parcelable from bundle.
     public static final String DISCOVER_MOVIE = "Discover Movie";
 
@@ -155,6 +152,9 @@ public class DetailsFragment extends Fragment
     // Reference to share action provider for sharing first trailer.
     private ShareActionProvider mShareActionProvider;
 
+    // Trailer url to be shared using share action provider.
+    String mTrailerUrl;
+
     public DetailsFragment() {
         setHasOptionsMenu(true);
     }
@@ -198,6 +198,9 @@ public class DetailsFragment extends Fragment
 
         // Set to true mark as favorite button state.
         mMarkAsFavBtnState = true;
+
+        // Default trailer url to share.
+        mTrailerUrl = getString(R.string.msg_err_trailers_unavailable);
 
         // Hide all views except load status till data is loaded.
         hideViews();
@@ -302,15 +305,18 @@ public class DetailsFragment extends Fragment
         // Inflate menu resource file.
         inflater.inflate(R.menu.menu_details_fragment, menu);
 
-        // Locate menu item with the share action provider.
-        MenuItem item = menu.findItem(R.id.action_share);
+        // Locate menu menuItem with the share action provider.
+        MenuItem menuItem = menu.findItem(R.id.action_share);
 
-        // Fetch and store the share action provider.
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        // Create and set the share action provider.
+        mShareActionProvider = new ShareActionProvider(getActivity());
+        MenuItemCompat.setActionProvider(menuItem, mShareActionProvider);
 
-        if(mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(createTrailerShareIntent("this is a trailer"));
-        }
+        // Create share intent.
+        Intent shareIntent = createTrailerShareIntent(mTrailerUrl);
+
+        // Set share intent to action provider.
+        setShareIntent(shareIntent);
     }
 
     /**
@@ -656,6 +662,24 @@ public class DetailsFragment extends Fragment
         if(mMovie.getTrailerList() != null && mMovie.getTrailerList().size() != 0) {
             // Add data into adapter for trailers list view.
             bindDataToView(mTrailersView);
+
+            // Get first trailer url to share.
+            mTrailerUrl = mMovie.getTrailerList().get(0).getUrl();
+
+            // Create share intent for sharing trailer url.
+            Intent shareIntent = createTrailerShareIntent(mTrailerUrl);
+
+            // Set share intent to action provider.
+            setShareIntent(shareIntent);
+        } else {
+            // Get default url to share.
+            mTrailerUrl = getString(R.string.msg_err_trailers_unavailable);
+
+            // Create share intent for sharing trailer url.
+            Intent shareIntent = createTrailerShareIntent(mTrailerUrl);
+
+            // Set share intent to action provider.
+            setShareIntent(shareIntent);
         }
 
         // Check for errors or invalid reviews data.

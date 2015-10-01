@@ -72,8 +72,6 @@
     <string name="runtime_units">" mins."</string>
     <!-- Mark as favorite -->
     <string name="mark_as_favorite">MARK AS\nFAVORITE</string>
-    <!-- Unmark from favorite -->
-    <string name="unmark_from_favorite">UNMARK FROM\nFAVORITE</string>
     <!-- Trailers label -->
     <string name="trailers_label">Trailers:</string>
     <!-- Reviews label -->
@@ -81,7 +79,7 @@
     <!-- Reviews label -->
     <string name="add_fav_service">Reviews:</string>
     <!-- Share trailer url -->
-    <string name="share_trailer_url">Trailer URL: </string>
+    <string name="share_trailer_url">"Trailer URL: "</string>
     <!-- Mark as favorite button state -->
     <string name="mark_fav_btn_state">Mark as favorite button state</string>
 

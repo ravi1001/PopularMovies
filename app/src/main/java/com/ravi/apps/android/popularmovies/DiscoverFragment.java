@@ -84,9 +84,6 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
     // Index of selected item or first visible item in the grid view.
     private int mGridIndex;
 
-    // Whether a movie has been selected.
-    private boolean mIsMovieSelected;
-
     public DiscoverFragment() {
     }
 
@@ -119,10 +116,19 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
         // Get the current sort order from shared preferences.
         mSortOrderPreference = Utility.getSortOrderPreference(getActivity());
 
-        // Check whether there was a configuration change.
+        // Check if it was a configuration change.
         if(savedInstanceState != null) {
-            // Restore the grid index only if the sort order preference has not changed.
-            restoreGridIndex(savedInstanceState);
+            // Retrieve the saved sort order preference.
+            String savedSortOrder = null;
+            if(savedInstanceState.containsKey(getString(R.string.pref_sort_order_key))) {
+                savedSortOrder = savedInstanceState.getString(getString(R.string.pref_sort_order_key));
+            }
+
+            // Retrieve the saved grid index only if sort order has not changed
+            if(mSortOrderPreference.equals(savedSortOrder)
+                    && savedInstanceState.containsKey(GRID_INDEX_KEY)) {
+                mGridIndex = savedInstanceState.getInt(GRID_INDEX_KEY);
+            }
         }
 
         return rootView;
@@ -183,10 +189,8 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
         // Save the current sort order preference.
         outState.putString(getString(R.string.pref_sort_order_key), mSortOrderPreference);
 
-        // Check if any movie was selected, if not save first visible position.
-        if(!mIsMovieSelected) {
-            mGridIndex = mGridView.getFirstVisiblePosition();
-        }
+        // Get the first visible grid position and save it in the grid index.
+        mGridIndex = mGridView.getFirstVisiblePosition();
 
         // Save the grid index.
         if(mGridIndex != GridView.INVALID_POSITION) {
@@ -198,10 +202,6 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        // Set movie selected flag and store the click position into grid index.
-        mIsMovieSelected = true;
-        mGridIndex = position;
-
         // Get the movie data corresponding to the movie clicked by user from adapter.
         Movie movie = (Movie) parent.getItemAtPosition(position);
 
@@ -215,23 +215,6 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
      */
     public interface OnMovieSelectedListener {
         void onMovieSelected(Movie movie);
-    }
-
-    /**
-     * Retrieves and restores the grid index after configuration change only if
-     * the sort order preference was not changed.
-     */
-    private void restoreGridIndex(Bundle savedInstanceState) {
-        // Check if the sort order preference is unchanged.
-        if(savedInstanceState.containsKey(getString(R.string.pref_sort_order_key))) {
-            if(mSortOrderPreference
-                    .equals(savedInstanceState.get(getString(R.string.pref_sort_order_key)))) {
-                // Retrieve and restore the saved grid index.
-                if(savedInstanceState.containsKey(GRID_INDEX_KEY)) {
-                    mGridIndex = savedInstanceState.getInt(GRID_INDEX_KEY);
-                }
-            }
-        }
     }
 
     /**
@@ -265,7 +248,7 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
                 // Data load successful. Add the loaded data into adapter.
                 mDiscoverAdapter.addAll(data.getData());
 
-                // Move to appropriate index.
+                // Move to appropriate grid index.
                 if(mGridIndex != GridView.INVALID_POSITION) {
                     mGridView.setSelection(mGridIndex);
                 }
@@ -326,6 +309,11 @@ public class DiscoverFragment extends Fragment implements GridView.OnItemClickLi
 
                 // Assign the cursor to the favorite adapter.
                 mFavoriteDiscoverAdapter.swapCursor(data);
+
+                // Move to appropriate grid index.
+                if(mGridIndex != GridView.INVALID_POSITION) {
+                    mGridView.setSelection(mGridIndex);
+                }
             } else {
                 // Display appropriate error message to user.
                 mEmptyGridMessage.setText(getString(R.string.msg_err_fetch_favorites));
