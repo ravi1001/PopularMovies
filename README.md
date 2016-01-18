@@ -1,5 +1,7 @@
 #Popular Movies
 
+##What is it?
+
 This is an Android app that enables users to discover popular movies 
 by fetching movies data from the [TMDB](https://www.themoviedb.org/) API. 
 
